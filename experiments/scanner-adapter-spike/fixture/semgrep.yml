@@ -1,0 +1,26 @@
+rules:
+  - id: scanrail.python.eval
+    message: Avoid eval() on user-controlled input.
+    severity: ERROR
+    languages:
+      - python
+    pattern: eval(...)
+    metadata:
+      category: security
+      technology:
+        - python
+      cwe:
+        - "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
+
+  - id: scanrail.python.shell-true
+    message: Avoid shell=True with dynamic command strings.
+    severity: WARNING
+    languages:
+      - python
+    pattern: subprocess.check_output($CMD, shell=True, ...)
+    metadata:
+      category: security
+      technology:
+        - python
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command"

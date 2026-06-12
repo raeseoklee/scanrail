@@ -7,3 +7,5 @@
 /tools.lock.yaml
 /node_modules/
 *.log
+!experiments/scanner-adapter-spike/out/raw/*.log
+experiments/scanner-adapter-spike/out/cache/

@@ -1,0 +1,5 @@
+2026-06-12T10:13:50Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-06-12T10:13:50Z	INFO	[checks-client] Need to update the checks bundle
+2026-06-12T10:13:50Z	INFO	[checks-client] Downloading the checks bundle...
+234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [-----------------------------------------------] 100.00% 1.02 MiB p/s 400ms2026-06-12T10:13:52Z	INFO	[terraform scanner] Scanning root module	file_path="."
+2026-06-12T10:13:52Z	INFO	Detected config files	num=2

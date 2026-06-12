@@ -1,0 +1,22 @@
+[
+ {
+  "RuleID": "scanrail-fake-secret",
+  "Description": "Scanrail fake secret used for adapter spike validation",
+  "StartLine": 3,
+  "EndLine": 3,
+  "StartColumn": 2,
+  "EndColumn": 51,
+  "Match": "REDACTED",
+  "Secret": "REDACTED",
+  "File": "/src/app.py",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 4.7683673,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "/src/app.py:scanrail-fake-secret:3"
+ }
+]

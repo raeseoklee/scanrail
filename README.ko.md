@@ -47,6 +47,7 @@ scanrail run --profile quick
 - [OSS 전략](docs/oss-strategy.ko.md)
 - [배포 전략](docs/distribution.ko.md)
 - [로드맵](docs/roadmap.ko.md)
+- [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)
 
 ## MVP 범위
 

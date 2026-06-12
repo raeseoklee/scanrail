@@ -49,6 +49,7 @@ Typical developer flow:
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
 - [Roadmap](docs/roadmap.md)
+- [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md)
 
 ## MVP Scope
 

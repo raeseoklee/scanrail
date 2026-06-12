@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scanrail Scanner Adapter Spike</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #17202a; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee4; padding: .55rem; text-align: left; }
+    th { background: #f6f8fa; }
+  </style>
+</head>
+<body>
+  <h1>Scanrail Scanner Adapter Spike</h1>
+  <p>Fixture: experiments/scanner-adapter-spike/fixture</p>
+  <p>Total findings: 10</p>
+  <table>
+    <thead><tr><th>Tool</th><th>Severity</th><th>Rule</th><th>Location</th><th>Title</th></tr></thead>
+    <tbody><tr><td>gitleaks</td><td>high</td><td>scanrail-fake-secret</td><td>app.py:3</td><td>Scanrail fake secret used for adapter spike validation</td></tr>
+<tr><td>semgrep</td><td>high</td><td>scanrail.python.eval</td><td>app.py:7</td><td>Avoid eval() on user-controlled input.</td></tr>
+<tr><td>semgrep</td><td>medium</td><td>scanrail.python.shell-true</td><td>app.py:11</td><td>Avoid shell=True with dynamic command strings.</td></tr>
+<tr><td>trivy</td><td>high</td><td>AWS-0086</td><td>main.tf:8</td><td>S3 Access block should block public ACL</td></tr>
+<tr><td>trivy</td><td>high</td><td>AWS-0087</td><td>main.tf:9</td><td>S3 Access block should block public policy</td></tr>
+<tr><td>trivy</td><td>low</td><td>AWS-0089</td><td>main.tf:1</td><td>S3 Bucket Logging</td></tr>
+<tr><td>trivy</td><td>medium</td><td>AWS-0090</td><td>main.tf:1</td><td>S3 Data should be versioned</td></tr>
+<tr><td>trivy</td><td>high</td><td>AWS-0091</td><td>main.tf:10</td><td>S3 Access Block should Ignore Public ACL</td></tr>
+<tr><td>trivy</td><td>high</td><td>AWS-0093</td><td>main.tf:11</td><td>S3 Access block should restrict public bucket to limit access</td></tr>
+<tr><td>trivy</td><td>high</td><td>AWS-0132</td><td>main.tf:1</td><td>S3 encryption should use Customer Managed Keys</td></tr></tbody>
+  </table>
+</body>
+</html>

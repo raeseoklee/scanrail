@@ -1,0 +1,8 @@
+title = "Scanrail scanner adapter spike"
+
+[[rules]]
+id = "scanrail-fake-secret"
+description = "Scanrail fake secret used for adapter spike validation"
+regex = '''SCANRAIL_FAKE_SECRET\s*=\s*"[^"]+"'''
+secretGroup = 0
+keywords = ["SCANRAIL_FAKE_SECRET"]

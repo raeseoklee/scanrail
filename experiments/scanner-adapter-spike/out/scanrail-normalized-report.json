@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "experiment": "scanner-adapter-spike",
+  "generated_at": "2026-06-12T10:13:52.598Z",
+  "fixture": "experiments/scanner-adapter-spike/fixture",
+  "commands": [
+    {
+      "tool": "gitleaks",
+      "image": "ghcr.io/gitleaks/gitleaks:v8.30.1",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/fixture:/src:ro",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/out/raw:/out",
+        "ghcr.io/gitleaks/gitleaks:v8.30.1",
+        "detect",
+        "--source=/src",
+        "--no-git",
+        "--config=/src/gitleaks.toml",
+        "--report-format=json",
+        "--report-path=/out/gitleaks.json",
+        "--redact=100",
+        "--exit-code=7"
+      ],
+      "exit_code": 7,
+      "expected_exit_codes": [
+        0,
+        7
+      ],
+      "started_at": "2026-06-12T10:13:48.643Z",
+      "completed_at": "2026-06-12T10:13:48.847Z",
+      "raw_artifacts": [
+        "experiments/scanner-adapter-spike/out/raw/gitleaks.json",
+        "experiments/scanner-adapter-spike/out/raw/gitleaks.stdout.log",
+        "experiments/scanner-adapter-spike/out/raw/gitleaks.stderr.log"
+      ]
+    },
+    {
+      "tool": "semgrep",
+      "image": "semgrep/semgrep:1.165.0",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/fixture:/src:ro",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/out/raw:/out",
+        "semgrep/semgrep:1.165.0",
+        "semgrep",
+        "scan",
+        "--config",
+        "/src/semgrep.yml",
+        "--json",
+        "--output",
+        "/out/semgrep.json",
+        "/src"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "started_at": "2026-06-12T10:13:48.848Z",
+      "completed_at": "2026-06-12T10:13:50.355Z",
+      "raw_artifacts": [
+        "experiments/scanner-adapter-spike/out/raw/semgrep.json",
+        "experiments/scanner-adapter-spike/out/raw/semgrep.stdout.log",
+        "experiments/scanner-adapter-spike/out/raw/semgrep.stderr.log"
+      ]
+    },
+    {
+      "tool": "trivy",
+      "image": "aquasec/trivy:0.71.0",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/fixture:/src:ro",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/out/raw:/out",
+        "-v",
+        "$REPO/experiments/scanner-adapter-spike/out/cache:/root/.cache",
+        "aquasec/trivy:0.71.0",
+        "config",
+        "--format",
+        "json",
+        "--output",
+        "/out/trivy.json",
+        "/src"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "started_at": "2026-06-12T10:13:50.355Z",
+      "completed_at": "2026-06-12T10:13:52.597Z",
+      "raw_artifacts": [
+        "experiments/scanner-adapter-spike/out/raw/trivy.json",
+        "experiments/scanner-adapter-spike/out/raw/trivy.stdout.log",
+        "experiments/scanner-adapter-spike/out/raw/trivy.stderr.log"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "tool": "gitleaks",
+      "rule_id": "scanrail-fake-secret",
+      "title": "Scanrail fake secret used for adapter spike validation",
+      "severity": "high",
+      "confidence": "high",
+      "file": "app.py",
+      "line": 3,
+      "description": "Gitleaks detected a secret-like value. The spike uses a custom fake-secret rule.",
+      "remediation": "Remove the secret value, rotate real credentials, and use an environment-backed secret store.",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/gitleaks.json"
+    },
+    {
+      "tool": "semgrep",
+      "rule_id": "scanrail.python.eval",
+      "title": "Avoid eval() on user-controlled input.",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "app.py",
+      "line": 7,
+      "description": "Avoid eval() on user-controlled input.",
+      "remediation": "Review the matched code path and replace unsafe dynamic execution with explicit, validated behavior.",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/semgrep.json"
+    },
+    {
+      "tool": "semgrep",
+      "rule_id": "scanrail.python.shell-true",
+      "title": "Avoid shell=True with dynamic command strings.",
+      "severity": "medium",
+      "confidence": "medium",
+      "file": "app.py",
+      "line": 11,
+      "description": "Avoid shell=True with dynamic command strings.",
+      "remediation": "Review the matched code path and replace unsafe dynamic execution with explicit, validated behavior.",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/semgrep.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0086",
+      "title": "S3 Access block should block public ACL",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 8,
+      "description": "S3 buckets should block public ACLs on buckets and any objects they contain. By blocking, PUTs with fail if the object has any public ACL a.\n",
+      "remediation": "Enable blocking any PUT calls with a public ACL specified",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0087",
+      "title": "S3 Access block should block public policy",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 9,
+      "description": "S3 bucket policy should have block public policy to prevent users from putting a policy that enable public access.\n",
+      "remediation": "Prevent policies that allow public access being PUT",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0089",
+      "title": "S3 Bucket Logging",
+      "severity": "low",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 1,
+      "description": "Ensures S3 bucket logging is enabled for S3 buckets",
+      "remediation": "Add a logging block to the resource to enable access logging",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0090",
+      "title": "S3 Data should be versioned",
+      "severity": "medium",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 1,
+      "description": "Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket.\n\nYou can use the S3 Versioning feature to preserve, retrieve, and restore every version of every object stored in your buckets.\n\nWith versioning you can recover more easily from both unintended user actions and application failures.\n\nWhen you enable versioning, also keep in mind the potential costs of storing noncurrent versions of objects. To help manage those costs, consider setting up an S3 Lifecycle configuration.\n",
+      "remediation": "Enable versioning to protect against accidental/malicious removal or modification",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0091",
+      "title": "S3 Access Block should Ignore Public ACL",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 10,
+      "description": "S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.\n",
+      "remediation": "Enable ignoring the application of public ACLs in PUT calls",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0093",
+      "title": "S3 Access block should restrict public bucket to limit access",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 11,
+      "description": "S3 buckets should restrict public policies for the bucket. By enabling, the restrict_public_buckets, only the bucket owner and AWS Services can access if it has a public policy.\n",
+      "remediation": "Limit the access to public buckets to only the owner or AWS Services (eg; CloudFront)",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    },
+    {
+      "tool": "trivy",
+      "rule_id": "AWS-0132",
+      "title": "S3 encryption should use Customer Managed Keys",
+      "severity": "high",
+      "confidence": "medium",
+      "file": "main.tf",
+      "line": 1,
+      "description": "Encryption using AWS keys provides protection for your S3 buckets. To gain greater control over encryption, such as key rotation, access policies, and auditability, use customer managed keys (CMKs) with SSE-KMS.\nNote that SSE-KMS is not supported for S3 server access logging destination buckets; in such cases, use SSE-S3 instead.\n",
+      "remediation": "Use SSE-KMS with a customer managed key (CMK)",
+      "raw_artifact": "experiments/scanner-adapter-spike/out/raw/trivy.json"
+    }
+  ],
+  "summary": {
+    "total_findings": 10,
+    "by_tool": {
+      "gitleaks": 1,
+      "semgrep": 2,
+      "trivy": 7
+    },
+    "by_severity": {
+      "high": 7,
+      "medium": 2,
+      "low": 1
+    }
+  }
+}

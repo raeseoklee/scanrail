@@ -22,6 +22,9 @@
   "scripts": {
     "test": "go test ./... && node packages/npm/cli/test-wrapper.mjs",
     "build:release": "node scripts/build-release.mjs",
-    "pack:dry-run": "npm pack --workspaces --dry-run"
+    "pack:dry-run": "npm pack --workspaces --dry-run",
+    "docs:check-links": "node scripts/check-markdown-links.mjs",
+    "experiment:scanner-spike": "node experiments/scanner-adapter-spike/run.mjs",
+    "experiment:scanner-spike:summary": "node experiments/scanner-adapter-spike/run.mjs --summary"
   }
 }
