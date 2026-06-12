@@ -19,7 +19,7 @@ for (const [goos, goarch, pkg, binaryName] of targets) {
   const outDir = join("dist", `${goos}-${goarch}`);
   mkdirSync(outDir, { recursive: true });
   const out = join(outDir, binaryName);
-  run("go", ["build", "-trimpath", "-ldflags", ldflags(), "-o", out, "./cmd/scanrail"], {
+  run("go", ["build", "-buildvcs=false", "-trimpath", "-ldflags", ldflags(), "-o", out, "./cmd/scanrail"], {
     GOOS: goos,
     GOARCH: goarch
   });

@@ -1,8 +1,10 @@
-# 아키텍처
+[ENGLISH](architecture.md) | [한국어](architecture.ko.md)
 
-## 개요
+# Architecture
 
-`scanrail`은 오픈소스 보안 스캐너를 직접 내장하지 않고, Docker 컨테이너로 실행한 뒤 결과를 수집/정규화/리포팅하는 오케스트레이터입니다.
+## Overview
+
+Scanrail is an orchestrator, not a scanner engine. It runs scanner adapters, gathers outputs, normalizes findings, applies policy, and writes reports.
 
 ```text
 Developer / CI
@@ -16,15 +18,15 @@ Developer / CI
       +-- auth/session manager
       +-- scanner adapters
       +-- finding normalizer
-      +-- risk engine
+      +-- policy engine
       +-- report generator
 ```
 
-## 주요 구성요소
+## Components
 
 ### CLI
 
-사용자가 직접 호출하는 인터페이스입니다.
+The CLI is the user-facing entrypoint.
 
 ```text
 scanrail doctor
@@ -35,181 +37,119 @@ scanrail update
 scanrail ci init
 ```
 
+The current MVP implements `doctor`, `init`, `setup`, `run`, and `version`.
+
 ### Config Loader
 
-`scanrail.yaml`, `tools.lock.yaml`, 환경변수, CLI 옵션을 병합합니다.
+The config loader merges values from CLI flags, environment variables, `scanrail.yaml`, organization defaults, and built-in defaults.
 
-우선순위:
+Precedence:
 
 1. CLI option
 2. Environment variable
 3. `scanrail.yaml`
-4. Organization default (v0.1에서는 예약 레이어)
+4. Organization default
 5. Built-in default
+
+The public v0.1 candidate implements a small typed config surface and keeps organization defaults as a future layer.
 
 ### Setup Manager
 
-Docker 기반 실행 환경을 준비합니다.
+The setup manager prepares local Scanrail workspace state and, in later adapter phases, Docker-backed scanner assets.
 
-담당 작업:
+Responsibilities:
 
-- Docker daemon 확인
-- Docker network 생성
-- 이미지 pull
-- 캐시 볼륨 준비
-- scanner DB/rule/template 업데이트
-- 도구 버전 lock 파일 생성
+- check Docker when needed
+- create `.scanrail` directories
+- prepare cache and report paths
+- manage scanner version lock data
+- avoid pulling placeholder scanner images
 
 ### Scan Orchestrator
 
-선택된 profile에 따라 scanner adapter를 순서대로 실행합니다.
+The orchestrator selects scanners from a profile, validates target availability, checks scanner safety capabilities, executes adapters, and records evidence.
 
-실행 원칙:
+Rules:
 
-- 독립적인 스캐너는 병렬 실행 가능
-- 같은 target에 과도한 요청을 보내는 스캐너는 rate limit 적용
-- active scan은 별도 승인 플래그가 있어야 실행
-- allowlist 검증 실패 시 즉시 중단
+- independent scanners may run in parallel in future phases
+- active or interactive scanners require stronger safety capabilities
+- missing profile-selected targets are skipped with evidence
+- explicitly selected scanners fail when their required target is missing
+- safety violations return exit code `5`
 
-### Auth/Session Manager
+### Auth and Session Manager
 
-인증이 필요한 대상에 대해 scanner가 사용할 수 있는 인증 정보를 구성합니다.
+Authentication is represented by references, not raw secrets. Tokens should be read from environment variables and redacted before any persistence.
 
-지원 예정 방식:
+Supported future modes:
 
 - none
 - bearer token
 - cookie
-- form login
-- recorded browser session
-
-중요 원칙:
-
-- secret은 `scanrail.yaml`에 저장하지 않는다.
-- 환경변수 또는 CI secret 참조만 저장한다.
-- 리포트에는 secret 원문을 남기지 않는다.
+- custom header
 
 ### Scanner Adapters
 
-각 오픈소스 도구 실행과 결과 파싱을 담당합니다.
+Each scanner integration is isolated behind an adapter contract.
 
-v0.1 adapter:
+Adapter responsibilities:
 
-- Gitleaks
-- Trivy
-- Semgrep
-- native security headers checker
-
-후속 adapter:
-
-- OWASP ZAP baseline
-- OWASP ZAP API scan
-- Nuclei safe templates
-- testssl.sh
-- Schemathesis
-- CodeQL
-- Nikto
-- Amass
-- Nmap
+- declare required targets
+- declare safety capabilities
+- build commands or native checks
+- execute scanner logic
+- preserve raw output where useful
+- normalize findings into the common model
 
 ### Finding Normalizer
 
-도구별 결과를 공통 모델로 변환합니다.
+The normalizer maps scanner-specific output into a shared finding shape:
 
-```yaml
-id: finding-001
-title: Missing Content-Security-Policy header
-severity: medium
-confidence: high
-source:
-  tool: zap
-  rule_id: 10038
-target:
-  type: url
-  value: https://staging.example.com
-classification:
-  cwe:
-    - CWE-693
-  owasp:
-    - A05:2021 Security Misconfiguration
-evidence:
-  request: redacted
-  response: redacted
-remediation: Add a restrictive Content-Security-Policy header.
-```
+- id
+- scanner
+- title
+- severity
+- category
+- target
+- evidence
+- remediation
+- references
 
-### Risk Engine
+### Policy Engine
 
-finding의 우선순위를 계산합니다.
-
-고려 요소:
-
-- scanner severity
-- confidence
-- CVSS
-- EPSS (v0.4 이후 외부 피드 연동)
-- CISA KEV 등재 여부 (v0.4 이후 외부 피드 연동)
-- asset criticality
-- production exposure
-- authentication requirement
-- exploitability
-
-v0.1은 scanner severity와 confidence 중심으로 우선순위를 계산합니다. EPSS/KEV 같은 외부 데이터 피드는 갱신 주기, 오프라인 동작, 캐시 무결성 정책을 정의한 뒤 v0.4에서 도입합니다.
+The policy engine decides whether findings should fail the command. It supports severity thresholds and planned ignore rules with reasons and expiration dates.
 
 ### Report Generator
 
-결과를 여러 포맷으로 생성합니다.
+Reports are written to `.scanrail/reports` by default.
 
-- HTML
+Initial formats:
+
 - JSON
+- HTML
+
+Planned formats:
+
 - SARIF
 - JUnit XML
 
-## 데이터 흐름
+## Data Flow
 
 ```text
 scanrail.yaml
-   |
-   v
-profile selection
-   |
-   v
-scanner execution
-   |
-   v
-raw scanner outputs
-   |
-   v
-normalization
-   |
-   v
-dedupe and risk scoring
-   |
-   v
-reports
+    |
+    v
+config loader -> safety validation -> scanner adapters
+    |                                      |
+    |                                      v
+    +------------------------------ normalized findings
+                                           |
+                                           v
+                              policy + reports + exit code
 ```
 
-## 파일 구조 제안
+## Safety Boundary
 
-```text
-.
-├─ scanrail.yaml
-├─ tools.lock.yaml
-├─ .env.scanrail.example
-└─ .scanrail/
-   ├─ cache/
-   ├─ raw/
-   └─ reports/
-```
+Scanrail does not assume every scanner can enforce every safety policy. Each adapter declares what it can enforce. If a profile requires stronger guarantees than the adapter provides, Scanrail skips the scanner or fails explicit execution.
 
-## 안전장치
-
-- allowlist 필수
-- active scan 기본 비활성화
-- production target 보호
-- blocked path 지원
-- 요청 rate limit
-- scanner 요청 헤더 추가
-- secret redaction
-- destructive endpoint 기본 차단
-- full profile 명시 플래그 요구
+Network-level enforcement through a dedicated proxy and Docker network is a later v0.x design.

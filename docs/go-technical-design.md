@@ -1,3 +1,5 @@
+[ENGLISH](go-technical-design.md) | [한국어](go-technical-design.ko.md)
+
 # Go Technical Design
 
 ## Purpose
