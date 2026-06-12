@@ -69,6 +69,8 @@ The npm package installs a thin JavaScript command wrapper plus the matching Go 
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
 - [npm Publish Runbook](docs/npm-publish.md)
+- [Release Risk Register](docs/release-risk-register.md)
+- [MCP Design](docs/mcp-design.md)
 - [Roadmap](docs/roadmap.md)
 - [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md)
 

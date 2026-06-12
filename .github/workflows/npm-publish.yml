@@ -4,11 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Run a dry-run or publish to npm
+        description: Validate, dry-run, or publish to npm
         required: true
         default: dry-run
         type: choice
         options:
+          - validate
           - dry-run
           - publish
       tag:
@@ -20,22 +21,19 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.26.x"
           cache: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
       - name: Record release metadata
         run: |
           echo "SCANRAIL_VERSION=$(node -p "require('./packages/npm/cli/package.json').version")" >> "$GITHUB_ENV"

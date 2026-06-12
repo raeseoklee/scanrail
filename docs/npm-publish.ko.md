@@ -2,7 +2,7 @@
 
 # npm Publish Runbook
 
-이 문서는 Scanrail의 첫 public npm publish 절차를 정리합니다.
+이 문서는 Scanrail의 public npm publish 절차를 정리합니다.
 
 ## Package Set
 
@@ -23,7 +23,7 @@ scanrail
 
 ## 현재 Registry 상태
 
-2026년 6월 12일 기준 `@scanrail/cli`, 6개 platform package, `scanrail`은 `0.1.0`으로 첫 public publish를 완료했습니다. 이후 publish 전 registry check에서 같은 package/version이 이미 존재하면 release를 중단해야 합니다.
+2026년 6월 12일 기준 `@scanrail/cli`, 6개 platform package, `scanrail`은 `0.1.0`으로 첫 public publish를 완료했습니다. 이후 `0.1.1`에서 GitHub Actions trusted publishing과 npm provenance를 검증했습니다. 이후 publish 전 registry check에서 같은 package/version이 이미 존재하면 release를 중단해야 합니다.
 
 ## 사전 조건
 
@@ -83,11 +83,12 @@ Allowed action: npm publish
 
 실행 순서:
 
-1. `mode=dry-run` 실행
-2. 모든 package dry-run 성공 확인
-3. `mode=publish` 실행
+1. npm에 접근하지 않고 workflow 인프라만 확인할 때 `mode=validate` 실행
+2. registry에 없는 새 version으로 bump한 뒤 `mode=dry-run` 실행
+3. 모든 package dry-run 성공 확인
+4. `mode=publish` 실행
 
-workflow는 GitHub OIDC(`id-token: write`)를 사용하고, 실제 publish 경로에서는 `--provenance`를 전달합니다.
+workflow는 GitHub OIDC(`id-token: write`)를 사용하고, 실제 publish 경로에서는 `--provenance`를 전달합니다. `NODE_AUTH_TOKEN`이나 action-level npm registry auth file은 의도적으로 설정하지 않습니다. trusted publishing이 OIDC로 publish identity를 제공합니다.
 
 ## Publish 후 Smoke Test
 
@@ -96,6 +97,7 @@ npm view scanrail version
 npm install -g scanrail
 scanrail version
 scanrail doctor
+npm audit signatures
 ```
 
 빈 project에서:
@@ -105,6 +107,8 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --only headers
 ```
 
+public npm registry 기준 OS matrix 검증은 `.github/workflows/npm-smoke.yml`을 실행하고 설치할 version 또는 dist-tag를 입력합니다.
+
 ## Rollback Notes
 
 npm package version은 일반적인 release 운용에서 immutable로 다룹니다. 잘못 publish했다면 `0.1.0`을 덮어쓰지 말고 수정된 patch version을 publish합니다.
@@ -113,4 +117,4 @@ npm package version은 일반적인 release 운용에서 immutable로 다룹니�
 
 - npm 계정의 2FA가 `auth-and-writes`이면 일반 npm login으로는 OTP가 필요할 수 있습니다.
 - release automation에서는 `bypass_2fa` automation token 또는 trusted publishing을 사용해야 interactive OTP를 피할 수 있습니다.
-- trusted publishing은 첫 package page가 생성된 뒤 package별 설정이 필요할 수 있습니다.
+- trusted publishing 설정은 이 저장소 밖 npm에 있습니다. publish workflow가 authentication 또는 provenance error로 실패하면 모든 package의 npm trusted publisher 설정을 확인합니다.

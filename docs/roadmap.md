@@ -100,6 +100,26 @@ Completion criteria:
 - stale ignores are visible
 - platform teams can provide shared policy without forking the tool
 
+## v0.5: Agent Integration
+
+Goal:
+
+- Let AI coding assistants use Scanrail safely without bypassing the CLI safety model.
+
+Features:
+
+- local MCP server over stdio
+- read-only resources for configuration, report summaries, and schemas
+- bounded tools for `doctor`, safe setup, native headers scans, and report summarization
+- explicit target allowlist enforcement
+- no secret values in MCP payloads
+
+Completion criteria:
+
+- MCP clients can inspect the current Scanrail state
+- tool calls cannot execute arbitrary shell commands
+- active or network-heavy scans require explicit user opt-in through Scanrail policy
+
 ## v1.0: Stable OSS Release
 
 Goal:

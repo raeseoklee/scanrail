@@ -67,6 +67,8 @@ npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go b
 - [OSS 전략](docs/oss-strategy.ko.md)
 - [배포 전략](docs/distribution.ko.md)
 - [npm Publish Runbook](docs/npm-publish.ko.md)
+- [릴리스 리스크 레지스터](docs/release-risk-register.ko.md)
+- [MCP 설계](docs/mcp-design.ko.md)
 - [로드맵](docs/roadmap.ko.md)
 - [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)
 

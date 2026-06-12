@@ -2,7 +2,7 @@
 
 # npm Publish Runbook
 
-This runbook covers the first public npm publish for Scanrail.
+This runbook covers public npm publishes for Scanrail.
 
 ## Package Set
 
@@ -23,7 +23,7 @@ scanrail
 
 ## Current Registry State
 
-As of June 12, 2026, `@scanrail/cli`, the six platform packages, and `scanrail` were first published at `0.1.0`. Registry checks before a later publish should fail the release if any target package/version already exists.
+As of June 12, 2026, `@scanrail/cli`, the six platform packages, and `scanrail` were first published at `0.1.0`. Version `0.1.1` later verified GitHub Actions trusted publishing with npm provenance. Registry checks before a later publish should fail the release if any target package/version already exists.
 
 ## Prerequisites
 
@@ -83,11 +83,12 @@ Allowed action: npm publish
 
 Then run the workflow manually:
 
-1. Run `mode=dry-run`.
-2. Confirm every package dry-run succeeds.
-3. Run `mode=publish`.
+1. Run `mode=validate` when checking workflow infrastructure without touching npm.
+2. Run `mode=dry-run` after bumping to a version that is not in the registry.
+3. Confirm every package dry-run succeeds.
+4. Run `mode=publish`.
 
-The workflow uses GitHub OIDC (`id-token: write`) and passes `--provenance` for the real publish path.
+The workflow uses GitHub OIDC (`id-token: write`) and passes `--provenance` for the real publish path. It intentionally does not configure `NODE_AUTH_TOKEN` or an action-level npm registry auth file; trusted publishing supplies the publish identity through OIDC.
 
 ## Post-Publish Smoke
 
@@ -96,6 +97,7 @@ npm view scanrail version
 npm install -g scanrail
 scanrail version
 scanrail doctor
+npm audit signatures
 ```
 
 On a clean project:
@@ -105,6 +107,8 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --only headers
 ```
 
+For OS matrix validation against the public npm registry, run `.github/workflows/npm-smoke.yml` with the version or dist-tag to install.
+
 ## Rollback Notes
 
 npm package versions are immutable in normal release practice. If a bad package is published, publish a fixed patch version instead of overwriting `0.1.0`.
@@ -113,4 +117,4 @@ npm package versions are immutable in normal release practice. If a bad package 
 
 - A normal npm login may require OTP when account-level 2FA is set to `auth-and-writes`.
 - Automation tokens with `bypass_2fa` or trusted publishing avoid interactive OTP in release automation.
-- Trusted publishing may need package-level configuration after the first package pages exist.
+- Trusted publishing settings live in npm outside this repository. If the publish workflow fails with authentication or provenance errors, verify the npm trusted publisher settings for every package.

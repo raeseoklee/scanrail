@@ -287,10 +287,11 @@ jobs:
   scanrail:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
+          package-manager-cache: false
       - run: npm install -g scanrail
       - run: scanrail run --profile quick
         env:

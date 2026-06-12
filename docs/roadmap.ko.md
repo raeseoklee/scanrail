@@ -123,6 +123,26 @@
 - 사용자/관리자 role별 API 접근 결과 비교 가능
 - 로그인 세션 만료 시 적절한 오류를 제공
 
+## v0.6: Agent Integration
+
+목표:
+
+- AI coding assistant가 Scanrail CLI의 safety model을 우회하지 않고 Scanrail을 안전하게 사용할 수 있게 한다.
+
+기능:
+
+- stdio 기반 local MCP server
+- configuration, report summary, schema용 read-only resource
+- `doctor`, safe setup, native headers scan, report summary용 제한된 tool
+- target allowlist 강제
+- MCP payload에 secret value 미포함
+
+완료 기준:
+
+- MCP client가 현재 Scanrail 상태를 확인할 수 있음
+- tool call이 arbitrary shell command를 실행할 수 없음
+- active scan 또는 network-heavy scan은 Scanrail policy를 통한 explicit opt-in 필요
+
 ## v1.0: OSS 안정화와 조직 표준화
 
 목표:
