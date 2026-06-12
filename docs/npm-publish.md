@@ -23,7 +23,7 @@ scanrail
 
 ## Current Registry State
 
-As of June 12, 2026, `@scanrail/cli`, the six platform packages, and `scanrail` are intended to be public at `0.1.0`. Registry checks before a later publish should fail the release if any target package/version already exists.
+As of June 12, 2026, `@scanrail/cli`, the six platform packages, and `scanrail` were first published at `0.1.0`. Registry checks before a later publish should fail the release if any target package/version already exists.
 
 ## Prerequisites
 

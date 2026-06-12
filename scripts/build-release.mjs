@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, rmSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -10,6 +10,7 @@ const targets = [
   ["linux", "amd64", "cli-linux-x64", "scanrail"],
   ["linux", "arm64", "cli-linux-arm64", "scanrail"]
 ];
+const packageVersion = JSON.parse(readFileSync(join("packages", "npm", "cli", "package.json"), "utf8")).version;
 
 run("go", ["test", "./..."]);
 rmSync("dist", { recursive: true, force: true });
@@ -37,7 +38,7 @@ function run(command, args, env = {}) {
 }
 
 function ldflags() {
-  const version = process.env.SCANRAIL_VERSION || "0.1.0";
+  const version = process.env.SCANRAIL_VERSION || packageVersion;
   const commit = process.env.SCANRAIL_COMMIT || "snapshot";
   const date = process.env.SCANRAIL_DATE || "snapshot";
   return [

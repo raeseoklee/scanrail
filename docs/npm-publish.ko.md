@@ -23,7 +23,7 @@ scanrail
 
 ## 현재 Registry 상태
 
-2026년 6월 12일 기준 `@scanrail/cli`, 6개 platform package, `scanrail`은 `0.1.0` public publish 대상입니다. 이후 publish 전 registry check에서 같은 package/version이 이미 존재하면 release를 중단해야 합니다.
+2026년 6월 12일 기준 `@scanrail/cli`, 6개 platform package, `scanrail`은 `0.1.0`으로 첫 public publish를 완료했습니다. 이후 publish 전 registry check에서 같은 package/version이 이미 존재하면 release를 중단해야 합니다.
 
 ## 사전 조건
 
