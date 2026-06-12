@@ -18,7 +18,10 @@ if (!binary) {
   }
 }
 
-const result = spawnSync(binary, process.argv.slice(2), { stdio: "inherit" });
+const result = spawnSync(binary, process.argv.slice(2), {
+  stdio: "inherit",
+  shell: shouldUseShell(binary)
+});
 
 if (result.error) {
   console.error(result.error.message);
@@ -32,3 +35,7 @@ if (result.signal) {
 }
 
 process.exit(result.status ?? 1);
+
+function shouldUseShell(binaryPath) {
+  return process.platform === "win32" && /\.(cmd|bat)$/i.test(binaryPath);
+}

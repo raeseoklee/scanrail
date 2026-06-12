@@ -2,6 +2,7 @@ import { mkdtempSync, writeFileSync, chmodSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const dir = mkdtempSync(join(tmpdir(), "scanrail-wrapper-"));
 try {
@@ -12,7 +13,8 @@ try {
     writeFileSync(fake, "#!/bin/sh\necho wrapper-ok \"$@\"\nexit 7\n");
     chmodSync(fake, 0o755);
   }
-  const result = spawnSync(process.execPath, [new URL("./bin/scanrail.js", import.meta.url).pathname, "doctor"], {
+  const wrapper = fileURLToPath(new URL("./bin/scanrail.js", import.meta.url));
+  const result = spawnSync(process.execPath, [wrapper, "doctor"], {
     env: { ...process.env, SCANRAIL_BINARY_PATH: fake },
     encoding: "utf8"
   });

@@ -39,7 +39,7 @@ function run(command, args, env = {}) {
 function ldflags() {
   const version = process.env.SCANRAIL_VERSION || "0.1.0";
   const commit = process.env.SCANRAIL_COMMIT || "snapshot";
-  const date = new Date().toISOString();
+  const date = process.env.SCANRAIL_DATE || "snapshot";
   return [
     `-X github.com/raeseoklee/scanrail/internal/version.Version=${version}`,
     `-X github.com/raeseoklee/scanrail/internal/version.Commit=${commit}`,
