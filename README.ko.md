@@ -2,6 +2,10 @@
 
 # Scanrail
 
+[![CI](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml/badge.svg)](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@scanrail/cli.svg)](https://www.npmjs.com/package/@scanrail/cli)
+[![License](https://img.shields.io/github/license/raeseoklee/scanrail.svg)](LICENSE)
+
 개발자가 직접 웹서비스 보안진단을 실행할 수 있도록, 검증된 오픈소스 보안 도구들을 하나의 CLI로 묶는 보안진단 오케스트레이터입니다.
 
 목표는 상용 보안 제품을 그대로 재구현하는 것이 아니라, 개인 개발자와 조직이 각자의 개발 흐름에 맞게 다음을 표준화하는 것입니다.
@@ -25,11 +29,27 @@ scanrail run --profile quick
 
 개발자 관점의 기본 흐름은 다음과 같습니다.
 
-1. Docker 설치
+1. Docker 기반 스캐너 사용 시 Docker 설치
 2. `scanrail init`으로 프로젝트 설정 생성
 3. `scanrail setup`으로 스캐너 이미지와 캐시 준비
 4. `scanrail run`으로 점검 실행
-5. HTML, JSON, SARIF 리포트 확인
+5. HTML, JSON 리포트 확인
+
+## 설치
+
+```bash
+npm install -g @scanrail/cli
+scanrail doctor
+```
+
+첫 릴리스 후보에서 실제 실행 가능한 native headers 점검:
+
+```bash
+scanrail init --non-interactive --project-name demo --target https://example.com
+scanrail run --only headers
+```
+
+npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go binary package를 설치합니다. Docker 기반 Gitleaks, Trivy, Semgrep adapter는 다음 구현 대상이며, 실제 command/output 계약은 [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)에 남겨두었습니다.
 
 ## 문서
 
@@ -46,6 +66,7 @@ scanrail run --profile quick
 - [오픈소스 도구 검토](docs/open-source-tools.ko.md)
 - [OSS 전략](docs/oss-strategy.ko.md)
 - [배포 전략](docs/distribution.ko.md)
+- [npm Publish Runbook](docs/npm-publish.ko.md)
 - [로드맵](docs/roadmap.ko.md)
 - [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)
 
@@ -53,14 +74,15 @@ scanrail run --profile quick
 
 초기 버전은 다음 기능을 우선 지원합니다.
 
-- 인터랙티브 초기 설정: `scanrail init`
-- Docker 기반 스캐너 준비: `scanrail setup`
-- 기본 진단 실행: `scanrail run`
-- 코드/의존성/시크릿/보안 헤더 점검
-- staging 웹 런타임/API/TLS 점검은 v0.2 이후 단계적으로 확장
-- HTML, JSON, SARIF 리포트 생성
-- CI 실패 기준 설정
-- Active Scan 안전장치
+- `scanrail doctor`
+- `scanrail init --non-interactive`
+- `scanrail setup --pull-policy never`
+- `scanrail run --only headers`
+- JSON, HTML 리포트 생성
+- macOS, Windows, Linux용 npm wrapper와 platform binary package
+- release dry-run 자동화
+
+Docker 기반 Gitleaks, Trivy, Semgrep adapter와 SARIF 리포트는 다음 단계에서 구현합니다.
 
 ## 개발
 
@@ -72,6 +94,10 @@ npm pack --workspaces --dry-run
 ```
 
 현재 첫 배포 후보는 `doctor`, `init --non-interactive`, `setup --pull-policy never`, `run --only headers`를 지원합니다. Docker 기반 Gitleaks, Trivy, Semgrep adapter는 패키징 골격과 실행 정책을 먼저 잡고, scanner별 command generation과 normalization을 다음 단계에서 채웁니다.
+
+## 라이선스
+
+Apache-2.0. [LICENSE](LICENSE)를 참고하세요.
 
 ## 기본 안전 원칙
 

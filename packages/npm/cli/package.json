@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/raeseoklee/scanrail#readme",
   "bin": {
-    "scanrail": "./bin/scanrail.js"
+    "scanrail": "bin/scanrail.js"
   },
   "files": [
     "bin/scanrail.js",
@@ -22,9 +22,24 @@
   "optionalDependencies": {
     "@scanrail/cli-darwin-arm64": "0.1.0",
     "@scanrail/cli-darwin-x64": "0.1.0",
-    "@scanrail/cli-win32-x64": "0.1.0",
-    "@scanrail/cli-win32-arm64": "0.1.0",
+    "@scanrail/cli-linux-arm64": "0.1.0",
     "@scanrail/cli-linux-x64": "0.1.0",
-    "@scanrail/cli-linux-arm64": "0.1.0"
-  }
+    "@scanrail/cli-win32-arm64": "0.1.0",
+    "@scanrail/cli-win32-x64": "0.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "security",
+    "security-scanner",
+    "devsecops",
+    "sast",
+    "dast",
+    "semgrep",
+    "trivy",
+    "gitleaks",
+    "owasp",
+    "cli"
+  ]
 }

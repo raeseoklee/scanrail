@@ -1,4 +1,4 @@
-.PHONY: build test release-dry-run experiment-scanner-spike tape-scanner-spike clean
+.PHONY: build test release-dry-run npm-publish-dry-run npm-publish experiment-scanner-spike tape-scanner-spike clean
 
 build:
 	go build -o bin/scanrail ./cmd/scanrail
@@ -14,6 +14,12 @@ release-dry-run:
 	node packages/npm/cli/test-wrapper.mjs
 	node scripts/build-release.mjs
 	npm pack --workspaces --dry-run
+
+npm-publish-dry-run:
+	npm run publish:dry-run
+
+npm-publish:
+	npm run publish:npm
 
 experiment-scanner-spike:
 	node experiments/scanner-adapter-spike/run.mjs

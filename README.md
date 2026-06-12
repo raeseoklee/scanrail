@@ -2,6 +2,10 @@
 
 # Scanrail
 
+[![CI](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml/badge.svg)](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@scanrail/cli.svg)](https://www.npmjs.com/package/@scanrail/cli)
+[![License](https://img.shields.io/github/license/raeseoklee/scanrail.svg)](LICENSE)
+
 Scanrail is a developer-first security scan orchestrator. It wraps proven open-source security tools behind one CLI so teams can run repeatable security checks before a pull request, release, or internal handoff.
 
 Scanrail does not try to reimplement a commercial SAST or DAST engine. Its job is to standardize how scanners are installed, configured, executed, normalized, and reported.
@@ -33,6 +37,22 @@ Typical developer flow:
 4. Run `scanrail run` to execute checks.
 5. Review HTML and JSON reports.
 
+## Install
+
+```bash
+npm install -g @scanrail/cli
+scanrail doctor
+```
+
+Run the first-release native headers check:
+
+```bash
+scanrail init --non-interactive --project-name demo --target https://example.com
+scanrail run --only headers
+```
+
+The npm package installs a thin JavaScript command wrapper plus the matching Go binary package for macOS, Windows, or Linux. Docker-backed Gitleaks, Trivy, and Semgrep adapters are planned next; their real command/output contracts are captured in the [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md).
+
 ## Documentation
 
 - [Product Requirements](docs/product-requirements.md)
@@ -48,6 +68,7 @@ Typical developer flow:
 - [Open Source Tool Review](docs/open-source-tools.md)
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
+- [npm Publish Runbook](docs/npm-publish.md)
 - [Roadmap](docs/roadmap.md)
 - [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md)
 
@@ -80,6 +101,10 @@ The full release dry-run is:
 ```bash
 make release-dry-run
 ```
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
 
 ## Safety Defaults
 
