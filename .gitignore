@@ -1,0 +1,9 @@
+/bin/
+/dist/
+/.scanrail/
+.omc/
+.omx/
+.codexus/
+/tools.lock.yaml
+/node_modules/
+*.log

@@ -1,0 +1,30 @@
+{
+  "name": "@scanrail/cli",
+  "version": "0.1.0",
+  "description": "Developer-first security scan orchestrator",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raeseoklee/scanrail.git",
+    "directory": "packages/npm/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/raeseoklee/scanrail/issues"
+  },
+  "homepage": "https://github.com/raeseoklee/scanrail#readme",
+  "bin": {
+    "scanrail": "./bin/scanrail.js"
+  },
+  "files": [
+    "bin/scanrail.js",
+    "README.md"
+  ],
+  "optionalDependencies": {
+    "@scanrail/cli-darwin-arm64": "0.1.0",
+    "@scanrail/cli-darwin-x64": "0.1.0",
+    "@scanrail/cli-win32-x64": "0.1.0",
+    "@scanrail/cli-win32-arm64": "0.1.0",
+    "@scanrail/cli-linux-x64": "0.1.0",
+    "@scanrail/cli-linux-arm64": "0.1.0"
+  }
+}

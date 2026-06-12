@@ -1,0 +1,27 @@
+{
+  "name": "scanrail-repo",
+  "private": true,
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raeseoklee/scanrail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raeseoklee/scanrail/issues"
+  },
+  "homepage": "https://github.com/raeseoklee/scanrail#readme",
+  "workspaces": [
+    "packages/npm/cli",
+    "packages/npm/cli-darwin-arm64",
+    "packages/npm/cli-darwin-x64",
+    "packages/npm/cli-win32-x64",
+    "packages/npm/cli-win32-arm64",
+    "packages/npm/cli-linux-x64",
+    "packages/npm/cli-linux-arm64"
+  ],
+  "scripts": {
+    "test": "go test ./... && node packages/npm/cli/test-wrapper.mjs",
+    "build:release": "node scripts/build-release.mjs",
+    "pack:dry-run": "npm pack --workspaces --dry-run"
+  }
+}
