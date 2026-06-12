@@ -3,7 +3,7 @@
 # Scanrail
 
 [![CI](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml/badge.svg)](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@scanrail/cli.svg)](https://www.npmjs.com/package/@scanrail/cli)
+[![npm](https://img.shields.io/npm/v/scanrail.svg)](https://www.npmjs.com/package/scanrail)
 [![License](https://img.shields.io/github/license/raeseoklee/scanrail.svg)](LICENSE)
 
 Scanrail is a developer-first security scan orchestrator. It wraps proven open-source security tools behind one CLI so teams can run repeatable security checks before a pull request, release, or internal handoff.
@@ -40,7 +40,7 @@ Typical developer flow:
 ## Install
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 scanrail doctor
 ```
 
@@ -51,7 +51,7 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --only headers
 ```
 
-The npm package installs a thin JavaScript command wrapper plus the matching Go binary package for macOS, Windows, or Linux. Docker-backed Gitleaks, Trivy, and Semgrep adapters are planned next; their real command/output contracts are captured in the [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md).
+The npm package installs a thin JavaScript command wrapper plus the matching Go binary package for macOS, Windows, or Linux. The scoped `@scanrail/cli` package remains available as the underlying wrapper package. Docker-backed Gitleaks, Trivy, and Semgrep adapters are planned next; their real command/output contracts are captured in the [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md).
 
 ## Documentation
 

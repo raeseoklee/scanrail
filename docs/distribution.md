@@ -18,6 +18,7 @@ Go binary
 ## npm Package Layout
 
 ```text
+scanrail
 @scanrail/cli
 @scanrail/cli-darwin-arm64
 @scanrail/cli-darwin-x64
@@ -27,14 +28,14 @@ Go binary
 @scanrail/cli-linux-arm64
 ```
 
-`@scanrail/cli` exposes the `scanrail` command and depends on platform packages through `optionalDependencies`.
+`scanrail` is the recommended user-facing npm package. It depends on `@scanrail/cli`, which exposes the `scanrail` command and depends on platform packages through `optionalDependencies`.
 
 ## User Installation
 
 Global install:
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 scanrail init
 scanrail setup
 scanrail run
@@ -43,30 +44,27 @@ scanrail run
 One-time execution:
 
 ```bash
-npx @scanrail/cli run --profile quick
+npx scanrail run --profile quick
 ```
+
+The scoped `@scanrail/cli` package remains available for users who want to install the underlying wrapper directly.
 
 ## Wrapper Package
 
 ```json
 {
-  "name": "@scanrail/cli",
+  "name": "scanrail",
   "version": "0.1.0",
   "bin": {
     "scanrail": "./bin/scanrail.js"
   },
-  "optionalDependencies": {
-    "@scanrail/cli-darwin-arm64": "0.1.0",
-    "@scanrail/cli-darwin-x64": "0.1.0",
-    "@scanrail/cli-win32-x64": "0.1.0",
-    "@scanrail/cli-win32-arm64": "0.1.0",
-    "@scanrail/cli-linux-x64": "0.1.0",
-    "@scanrail/cli-linux-arm64": "0.1.0"
+  "dependencies": {
+    "@scanrail/cli": "0.1.0"
   }
 }
 ```
 
-The wrapper should:
+The scoped wrapper should:
 
 - detect `process.platform` and `process.arch`
 - resolve the matching platform package

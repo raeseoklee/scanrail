@@ -16,13 +16,14 @@ platform package를 먼저 publish하고, wrapper package를 마지막에 publis
 @scanrail/cli-linux-x64
 @scanrail/cli-linux-arm64
 @scanrail/cli
+scanrail
 ```
 
-`@scanrail/cli`는 platform package를 `optionalDependencies`로 참조하므로 wrapper를 마지막에 publish해야 설치 중 깨진 의존성 창을 줄일 수 있습니다.
+`@scanrail/cli`는 platform package를 `optionalDependencies`로 참조하므로 platform package 뒤에 publish해야 설치 중 깨진 의존성 창을 줄일 수 있습니다. unscoped `scanrail` package는 `@scanrail/cli`에 의존하며, 사용자가 설치하는 기본 entrypoint로 마지막에 publish합니다.
 
 ## 현재 Registry 상태
 
-2026년 6월 12일 기준 로컬 registry 조회에서 `@scanrail/cli`, `@scanrail/cli-darwin-arm64`는 `E404 Not Found`를 반환했습니다. 현재 로컬 머신은 npm에 인증되어 있지 않아(`npm whoami`가 `E401` 반환) 최종 publish에는 `@scanrail` scope 권한이 있는 npm 계정이 필요합니다.
+2026년 6월 12일 기준 `@scanrail/cli`, 6개 platform package, `scanrail`은 `0.1.0` public publish 대상입니다. 이후 publish 전 registry check에서 같은 package/version이 이미 존재하면 release를 중단해야 합니다.
 
 ## 사전 조건
 
@@ -59,6 +60,13 @@ SCANRAIL_ALLOW_NPM_PUBLISH=1 npm run publish:npm
 
 guard variable은 의도된 안전장치입니다. `SCANRAIL_ALLOW_NPM_PUBLISH=1`이 없으면 실제 publish는 실행되지 않습니다.
 
+이미 publish된 package를 건너뛰고 특정 package만 publish해야 하는 경우:
+
+```bash
+node scripts/publish-npm.mjs --dry-run --only scanrail
+SCANRAIL_ALLOW_NPM_PUBLISH=1 node scripts/publish-npm.mjs --publish --only scanrail
+```
+
 ## GitHub Actions Publish
 
 workflow 파일은 `.github/workflows/npm-publish.yml`입니다.
@@ -84,8 +92,8 @@ workflow는 GitHub OIDC(`id-token: write`)를 사용하고, 실제 publish 경�
 ## Publish 후 Smoke Test
 
 ```bash
-npm view @scanrail/cli version
-npm install -g @scanrail/cli
+npm view scanrail version
+npm install -g scanrail
 scanrail version
 scanrail doctor
 ```
@@ -103,6 +111,6 @@ npm package version은 일반적인 release 운용에서 immutable로 다룹니�
 
 ## 알려진 First-Publish Blocker
 
-- 현재 로컬 환경은 npm에 로그인되어 있지 않습니다.
-- maintainer가 `@scanrail` scope를 사용할 수 있어야 합니다.
+- npm 계정의 2FA가 `auth-and-writes`이면 일반 npm login으로는 OTP가 필요할 수 있습니다.
+- release automation에서는 `bypass_2fa` automation token 또는 trusted publishing을 사용해야 interactive OTP를 피할 수 있습니다.
 - trusted publishing은 첫 package page가 생성된 뒤 package별 설정이 필요할 수 있습니다.

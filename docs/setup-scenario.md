@@ -7,7 +7,7 @@ This document shows the expected first-run flow for a developer adopting Scanrai
 ## 1. Install
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 ```
 
 The npm wrapper is the primary install path for the first public release. Release archives and installer scripts can be added after release automation is mature.

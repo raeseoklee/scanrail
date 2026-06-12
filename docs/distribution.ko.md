@@ -18,6 +18,7 @@ Go binary
 ## npm 패키지 구조
 
 ```text
+scanrail
 @scanrail/cli
 @scanrail/cli-darwin-arm64
 @scanrail/cli-darwin-x64
@@ -27,14 +28,14 @@ Go binary
 @scanrail/cli-linux-arm64
 ```
 
-최종 package scope와 이름은 npm availability를 확인한 뒤 확정합니다.
+`scanrail`은 사용자가 설치하는 기본 npm package입니다. 이 package는 `@scanrail/cli`에 의존하고, `@scanrail/cli`가 platform package를 `optionalDependencies`로 참조합니다.
 
 ## 사용자 설치 UX
 
 전역 설치:
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 scanrail init
 scanrail setup
 scanrail run
@@ -43,25 +44,22 @@ scanrail run
 일회성 실행:
 
 ```bash
-npx @scanrail/cli run --profile quick
+npx scanrail run --profile quick
 ```
+
+scoped `@scanrail/cli` package는 내부 wrapper를 직접 설치하려는 사용자를 위해 계속 제공합니다.
 
 ## wrapper package 예시
 
 ```json
 {
-  "name": "@scanrail/cli",
+  "name": "scanrail",
   "version": "0.1.0",
   "bin": {
     "scanrail": "./bin/scanrail.js"
   },
-  "optionalDependencies": {
-    "@scanrail/cli-darwin-arm64": "0.1.0",
-    "@scanrail/cli-darwin-x64": "0.1.0",
-    "@scanrail/cli-win32-x64": "0.1.0",
-    "@scanrail/cli-win32-arm64": "0.1.0",
-    "@scanrail/cli-linux-x64": "0.1.0",
-    "@scanrail/cli-linux-arm64": "0.1.0"
+  "dependencies": {
+    "@scanrail/cli": "0.1.0"
   }
 }
 ```

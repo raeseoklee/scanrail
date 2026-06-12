@@ -9,7 +9,8 @@ const packages = [
   "packages/npm/cli-win32-arm64",
   "packages/npm/cli-linux-x64",
   "packages/npm/cli-linux-arm64",
-  "packages/npm/cli"
+  "packages/npm/cli",
+  "packages/npm/scanrail"
 ];
 
 const args = new Set(process.argv.slice(2));
@@ -17,14 +18,16 @@ const publish = args.has("--publish");
 const dryRun = !publish;
 const provenance = args.has("--provenance");
 const tag = readOption("--tag") || "latest";
+const only = readOptions("--only");
 
 if (publish && process.env.SCANRAIL_ALLOW_NPM_PUBLISH !== "1") {
   fail("Refusing real npm publish without SCANRAIL_ALLOW_NPM_PUBLISH=1.");
 }
 
-const manifests = packages.map((dir) => readManifest(dir));
-const expectedVersion = manifests.at(-1).version;
-for (const manifest of manifests) {
+const allManifests = packages.map((dir) => readManifest(dir));
+const manifests = filterManifests(allManifests, only);
+const expectedVersion = allManifests.find((manifest) => manifest.name === "@scanrail/cli")?.version ?? allManifests.at(-1).version;
+for (const manifest of allManifests) {
   if (manifest.version !== expectedVersion) {
     fail(`${manifest.name} version ${manifest.version} does not match wrapper version ${expectedVersion}.`);
   }
@@ -46,12 +49,34 @@ function readOption(name) {
   return process.argv[index + 1] || null;
 }
 
+function readOptions(name) {
+  const values = [];
+  for (let index = 0; index < process.argv.length; index += 1) {
+    if (process.argv[index] === name && process.argv[index + 1]) {
+      values.push(process.argv[index + 1]);
+    }
+  }
+  return values;
+}
+
 function readManifest(dir) {
   const path = join(process.cwd(), dir, "package.json");
   return {
     dir,
     ...JSON.parse(readFileSync(path, "utf8"))
   };
+}
+
+function filterManifests(manifests, onlyValues) {
+  if (onlyValues.length === 0) return manifests;
+  const selected = manifests.filter((manifest) => {
+    const dirName = manifest.dir.split("/").at(-1);
+    return onlyValues.includes(manifest.name) || onlyValues.includes(manifest.dir) || onlyValues.includes(dirName);
+  });
+  if (selected.length !== onlyValues.length) {
+    fail(`Could not match every --only package: ${onlyValues.join(", ")}.`);
+  }
+  return selected;
 }
 
 function checkRegistry(manifest) {

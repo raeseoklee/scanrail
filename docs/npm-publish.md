@@ -16,13 +16,14 @@ Publish platform packages first, then the wrapper package:
 @scanrail/cli-linux-x64
 @scanrail/cli-linux-arm64
 @scanrail/cli
+scanrail
 ```
 
-`@scanrail/cli` depends on the platform packages through `optionalDependencies`, so publishing the wrapper last avoids a broken install window.
+`@scanrail/cli` depends on the platform packages through `optionalDependencies`, so publishing it after the platform packages avoids a broken install window. The unscoped `scanrail` package depends on `@scanrail/cli` and is published last as the recommended user-facing entrypoint.
 
 ## Current Registry State
 
-As of June 12, 2026, local registry checks returned `E404 Not Found` for `@scanrail/cli` and `@scanrail/cli-darwin-arm64`. The local machine is not authenticated to npm (`npm whoami` returns `E401`), so the final publish requires an npm account with rights to the `@scanrail` scope.
+As of June 12, 2026, `@scanrail/cli`, the six platform packages, and `scanrail` are intended to be public at `0.1.0`. Registry checks before a later publish should fail the release if any target package/version already exists.
 
 ## Prerequisites
 
@@ -59,6 +60,13 @@ SCANRAIL_ALLOW_NPM_PUBLISH=1 npm run publish:npm
 
 The guard variable is intentional. Without `SCANRAIL_ALLOW_NPM_PUBLISH=1`, the publish script refuses to run a real publish.
 
+To publish only one package, for example an alias package added after the scoped packages already exist:
+
+```bash
+node scripts/publish-npm.mjs --dry-run --only scanrail
+SCANRAIL_ALLOW_NPM_PUBLISH=1 node scripts/publish-npm.mjs --publish --only scanrail
+```
+
 ## GitHub Actions Publish
 
 The workflow is `.github/workflows/npm-publish.yml`.
@@ -84,8 +92,8 @@ The workflow uses GitHub OIDC (`id-token: write`) and passes `--provenance` for 
 ## Post-Publish Smoke
 
 ```bash
-npm view @scanrail/cli version
-npm install -g @scanrail/cli
+npm view scanrail version
+npm install -g scanrail
 scanrail version
 scanrail doctor
 ```
@@ -103,6 +111,6 @@ npm package versions are immutable in normal release practice. If a bad package 
 
 ## Known First-Publish Blockers
 
-- The current local environment is not logged in to npm.
-- The `@scanrail` scope must be available or controlled by the maintainer.
+- A normal npm login may require OTP when account-level 2FA is set to `auth-and-writes`.
+- Automation tokens with `bypass_2fa` or trusted publishing avoid interactive OTP in release automation.
 - Trusted publishing may need package-level configuration after the first package pages exist.

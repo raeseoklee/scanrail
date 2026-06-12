@@ -3,7 +3,7 @@
 # Scanrail
 
 [![CI](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml/badge.svg)](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@scanrail/cli.svg)](https://www.npmjs.com/package/@scanrail/cli)
+[![npm](https://img.shields.io/npm/v/scanrail.svg)](https://www.npmjs.com/package/scanrail)
 [![License](https://img.shields.io/github/license/raeseoklee/scanrail.svg)](LICENSE)
 
 개발자가 직접 웹서비스 보안진단을 실행할 수 있도록, 검증된 오픈소스 보안 도구들을 하나의 CLI로 묶는 보안진단 오케스트레이터입니다.
@@ -38,7 +38,7 @@ scanrail run --profile quick
 ## 설치
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 scanrail doctor
 ```
 
@@ -49,7 +49,7 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --only headers
 ```
 
-npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go binary package를 설치합니다. Docker 기반 Gitleaks, Trivy, Semgrep adapter는 다음 구현 대상이며, 실제 command/output 계약은 [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)에 남겨두었습니다.
+npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go binary package를 설치합니다. scoped `@scanrail/cli` package는 내부 wrapper package로 계속 사용할 수 있습니다. Docker 기반 Gitleaks, Trivy, Semgrep adapter는 다음 구현 대상이며, 실제 command/output 계약은 [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)에 남겨두었습니다.
 
 ## 문서
 

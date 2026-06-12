@@ -1,0 +1,40 @@
+{
+  "name": "scanrail",
+  "version": "0.1.0",
+  "description": "Developer-first security scan orchestrator",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raeseoklee/scanrail.git",
+    "directory": "packages/npm/scanrail"
+  },
+  "bugs": {
+    "url": "https://github.com/raeseoklee/scanrail/issues"
+  },
+  "homepage": "https://github.com/raeseoklee/scanrail#readme",
+  "bin": {
+    "scanrail": "bin/scanrail.js"
+  },
+  "files": [
+    "bin/scanrail.js",
+    "README.md"
+  ],
+  "dependencies": {
+    "@scanrail/cli": "0.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "security",
+    "security-scanner",
+    "devsecops",
+    "sast",
+    "dast",
+    "semgrep",
+    "trivy",
+    "gitleaks",
+    "owasp",
+    "cli"
+  ]
+}

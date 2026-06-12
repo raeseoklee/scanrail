@@ -11,6 +11,7 @@
   },
   "homepage": "https://github.com/raeseoklee/scanrail#readme",
   "workspaces": [
+    "packages/npm/scanrail",
     "packages/npm/cli",
     "packages/npm/cli-darwin-arm64",
     "packages/npm/cli-darwin-x64",
@@ -20,7 +21,7 @@
     "packages/npm/cli-linux-arm64"
   ],
   "scripts": {
-    "test": "go test ./... && node packages/npm/cli/test-wrapper.mjs",
+    "test": "go test ./... && node packages/npm/cli/test-wrapper.mjs && node packages/npm/scanrail/test-wrapper.mjs",
     "build:release": "node scripts/build-release.mjs",
     "pack:dry-run": "npm pack --workspaces --dry-run",
     "publish:dry-run": "npm run build:release && node scripts/publish-npm.mjs --dry-run",

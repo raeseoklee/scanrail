@@ -1,4 +1,4 @@
-# Scanrail CLI
+# Scanrail
 
 [![npm](https://img.shields.io/npm/v/scanrail.svg)](https://www.npmjs.com/package/scanrail)
 [![CI](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml/badge.svg)](https://github.com/raeseoklee/scanrail/actions/workflows/ci.yml)
@@ -6,7 +6,7 @@
 
 Developer-first security scan orchestration from one CLI.
 
-This package installs the `scanrail` command and delegates to the platform-specific Go binary package for macOS, Windows, or Linux.
+This package installs the `scanrail` command. It delegates to `@scanrail/cli`, which installs the matching platform-specific Go binary package for macOS, Windows, or Linux.
 
 ## Install
 
@@ -28,11 +28,11 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --only headers
 ```
 
-The first release candidate includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, and a native security headers scanner. Docker-backed adapters for Gitleaks, Trivy, and Semgrep are planned next.
+The first release includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, and a native security headers scanner. Docker-backed adapters for Gitleaks, Trivy, and Semgrep are planned next.
 
 ## Package Layout
 
-`scanrail` is the recommended npm entrypoint. `@scanrail/cli` is the underlying scoped wrapper package and installs one optional platform package:
+`scanrail` is the recommended npm entrypoint. It depends on `@scanrail/cli`, which installs one optional platform package:
 
 - `@scanrail/cli-darwin-arm64`
 - `@scanrail/cli-darwin-x64`

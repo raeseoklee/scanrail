@@ -29,7 +29,7 @@ npm view @scanrail/cli-darwin-arm64 name version description --json
 npm search scanrail --json
 ```
 
-Observed results:
+Initial observed results before publishing:
 
 - `scanrail`: `E404 Not Found`
 - `@scanrail/cli`: `E404 Not Found`
@@ -41,13 +41,14 @@ Interpretation:
 
 - The unscoped `scanrail` package appeared unclaimed at the time of checking.
 - The scoped `@scanrail/cli` package also appeared unpublished.
-- The availability of the `@scanrail` scope itself must still be confirmed during npm login/organization setup. `npm org ls scanrail --json` returned `E401` in the local environment because npm authentication was not available.
+- The `@scanrail` npm organization was later confirmed under the maintainer account.
 
 ## Package Strategy
 
-Preferred:
+Use `scanrail` as the recommended user-facing package and keep scoped packages for the wrapper and platform binaries:
 
 ```text
+scanrail
 @scanrail/cli
 @scanrail/cli-darwin-arm64
 @scanrail/cli-darwin-x64
@@ -57,16 +58,4 @@ Preferred:
 @scanrail/cli-linux-arm64
 ```
 
-Fallback:
-
-```text
-scanrail
-scanrail-darwin-arm64
-scanrail-darwin-x64
-scanrail-win32-x64
-scanrail-win32-arm64
-scanrail-linux-x64
-scanrail-linux-arm64
-```
-
-Use the scoped package set if the scope can be secured. Otherwise, publish the unscoped package set.
+The unscoped `scanrail` package depends on `@scanrail/cli`. The platform packages remain scoped to avoid occupying six additional unscoped npm names.

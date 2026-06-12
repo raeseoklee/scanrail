@@ -7,7 +7,7 @@
 ## 1. 설치
 
 ```bash
-npm install -g @scanrail/cli
+npm install -g scanrail
 ```
 
 첫 공개 릴리스 전에는 npm 설치를 기본 경로로 사용합니다. release archive와 설치 스크립트는 릴리스 자동화가 준비된 뒤 추가합니다.
@@ -291,7 +291,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install -g @scanrail/cli
+      - run: npm install -g scanrail
       - run: scanrail run --profile quick
         env:
           SCANRAIL_TOKEN: ${{ secrets.SCANRAIL_TOKEN }}

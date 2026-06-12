@@ -29,7 +29,7 @@ npm view @scanrail/cli-darwin-arm64 name version description --json
 npm search scanrail --json
 ```
 
-결과:
+publish 전 최초 결과:
 
 - `scanrail`: `E404 Not Found`
 - `@scanrail/cli`: `E404 Not Found`
@@ -41,13 +41,14 @@ npm search scanrail --json
 
 - unscoped package `scanrail`은 registry상 비어 있는 것으로 보입니다.
 - scoped package `@scanrail/cli`도 아직 게시된 package가 없습니다.
-- 다만 `@scanrail` scope 자체의 생성 가능 여부는 npm 로그인 후 사용자/조직 생성 단계에서 최종 확인해야 합니다. `npm org ls scanrail --json`은 현재 로컬 npm 인증 문제로 `E401`을 반환했습니다.
+- 이후 maintainer 계정에서 `@scanrail` npm organization을 사용할 수 있음을 확인했습니다.
 
 ## Package Strategy
 
-선호:
+사용자가 설치하는 기본 package는 `scanrail`로 두고, wrapper와 platform binary는 scoped package로 유지합니다.
 
 ```text
+scanrail
 @scanrail/cli
 @scanrail/cli-darwin-arm64
 @scanrail/cli-darwin-x64
@@ -57,16 +58,4 @@ npm search scanrail --json
 @scanrail/cli-linux-arm64
 ```
 
-fallback:
-
-```text
-scanrail
-scanrail-darwin-arm64
-scanrail-darwin-x64
-scanrail-win32-x64
-scanrail-win32-arm64
-scanrail-linux-x64
-scanrail-linux-arm64
-```
-
-scope를 확보할 수 있으면 scoped package를 우선 사용합니다. scope 확보가 어려우면 unscoped `scanrail` package로 전환합니다.
+unscoped `scanrail` package는 `@scanrail/cli`에 의존합니다. platform package는 scoped 이름으로 유지해 불필요하게 unscoped npm 이름 6개를 점유하지 않습니다.

@@ -93,7 +93,7 @@ Rejected because platform-specific npm packages are more transparent and registr
 
 Positive:
 
-- Users can run `npm install -g @scanrail/cli`.
+- Users can run `npm install -g scanrail`.
 - The Go binary remains usable without npm.
 - Runtime dependency surface stays small.
 - Release artifacts can support npm, archives, Homebrew, and Scoop from the same build matrix.
