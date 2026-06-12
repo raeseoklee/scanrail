@@ -19,11 +19,11 @@ try {
 }
 
 function run(command, args, cwd) {
-  const executable = process.platform === "win32" && command === "npm" ? "npm.cmd" : command;
-  const result = spawnSync(executable, args, {
+  const result = spawnSync(command, args, {
     cwd,
     stdio: "inherit",
-    env: process.env
+    env: process.env,
+    shell: process.platform === "win32"
   });
   if (result.error) {
     console.error(result.error.message);
