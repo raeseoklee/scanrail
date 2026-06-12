@@ -1,4 +1,4 @@
-.PHONY: build test release-dry-run npm-publish-dry-run npm-publish experiment-scanner-spike tape-scanner-spike tape-headers-demo clean
+.PHONY: build test release-dry-run npm-publish-dry-run npm-publish experiment-scanner-spike tape-scanner-spike tape-headers-demo tape-mcp-verification clean
 
 build:
 	go build -o bin/scanrail ./cmd/scanrail
@@ -31,6 +31,9 @@ tape-scanner-spike:
 
 tape-headers-demo:
 	vhs examples/headers-demo/tapes/headers-demo.tape
+
+tape-mcp-verification:
+	vhs examples/mcp-verification/tapes/mcp-verification.tape
 
 clean:
 	rm -rf bin dist .scanrail

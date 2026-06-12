@@ -86,6 +86,16 @@ The MCP MVP exposes bounded tools for `doctor`, config reading, latest report su
 - [Roadmap](docs/roadmap.md)
 - [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md)
 
+## Demo Recordings
+
+MCP verification:
+
+![MCP verification tape](docs/assets/mcp-verification.gif)
+
+Scanner adapter spike:
+
+![Scanner adapter spike tape](docs/assets/scanner-adapter-spike.gif)
+
 ## MVP Scope
 
 The current first-release candidate supports:

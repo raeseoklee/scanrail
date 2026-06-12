@@ -84,6 +84,16 @@ MCP MVP는 `doctor`, config read, latest report summary, 그리고 명시적 act
 - [로드맵](docs/roadmap.ko.md)
 - [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)
 
+## 데모 녹화
+
+MCP 검증:
+
+![MCP verification tape](docs/assets/mcp-verification.gif)
+
+Scanner adapter 실증:
+
+![Scanner adapter spike tape](docs/assets/scanner-adapter-spike.gif)
+
 ## MVP 범위
 
 초기 버전은 다음 기능을 우선 지원합니다.

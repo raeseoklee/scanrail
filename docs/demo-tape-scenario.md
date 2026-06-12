@@ -31,6 +31,19 @@ vhs examples/headers-demo/tapes/headers-demo.tape
 
 The generated GIF should be committed only when it is short, readable, and does not contain local secrets or private paths.
 
+## MCP Verification Tape
+
+The MCP verification scenario installs the published npm package, starts a local target, talks to `scanrail mcp serve` over stdio JSON-RPC, checks safety confirmation behavior, runs the native headers scanner, and reads the latest report summary.
+
+```bash
+node examples/mcp-verification/run.mjs
+vhs examples/mcp-verification/tapes/mcp-verification.tape
+```
+
+The generated GIF is stored at `docs/assets/mcp-verification.gif`.
+
+![MCP verification tape](assets/mcp-verification.gif)
+
 ## Existing Adapter Spike Tape
 
 The scanner adapter spike has a separate tape:
@@ -40,3 +53,5 @@ vhs experiments/scanner-adapter-spike/tapes/scanner-adapter-spike.tape
 ```
 
 Use this tape to explain future Docker-backed adapter normalization work.
+
+![Scanner adapter spike tape](assets/scanner-adapter-spike.gif)

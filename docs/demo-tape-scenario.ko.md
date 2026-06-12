@@ -31,6 +31,19 @@ vhs examples/headers-demo/tapes/headers-demo.tape
 
 생성된 GIF는 짧고 읽기 쉬우며 local secret이나 private path가 포함되지 않을 때만 commit합니다.
 
+## MCP Verification Tape
+
+MCP verification scenario는 published npm package를 설치하고, local target을 시작한 뒤 `scanrail mcp serve`와 stdio JSON-RPC로 통신합니다. safety confirmation 동작, native headers scan, latest report summary resource를 함께 확인합니다.
+
+```bash
+node examples/mcp-verification/run.mjs
+vhs examples/mcp-verification/tapes/mcp-verification.tape
+```
+
+생성된 GIF는 `docs/assets/mcp-verification.gif`에 저장됩니다.
+
+![MCP verification tape](assets/mcp-verification.gif)
+
 ## 기존 Adapter Spike Tape
 
 scanner adapter spike에는 별도 tape가 있습니다.
@@ -40,3 +53,5 @@ vhs experiments/scanner-adapter-spike/tapes/scanner-adapter-spike.tape
 ```
 
 이 tape는 이후 Docker-backed adapter normalization 작업을 설명할 때 사용합니다.
+
+![Scanner adapter spike tape](assets/scanner-adapter-spike.gif)
