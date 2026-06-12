@@ -11,6 +11,7 @@
 | GitHub Actions Node 20 runtime deprecation warning | 완화 | workflow가 `node24` action runtime을 선언하는 `actions/checkout@v5`, `actions/setup-node@v5`, `actions/setup-go@v6`를 사용합니다. |
 | publish workflow의 npm `always-auth` warning | 완화 | publish workflow가 더 이상 `setup-node`에 npm registry auth 설정 생성을 요청하지 않습니다. Trusted publishing은 `.npmrc` token auth 대신 OIDC를 사용합니다. |
 | published package가 모든 target OS에서 실행되는지 불확실 | workflow로 완화 | `.github/workflows/npm-smoke.yml`이 Ubuntu, macOS, Windows에서 public `scanrail` package를 설치하고 `version`, `doctor`, `npm audit signatures`를 실행합니다. |
+| Windows hosted runner label migration | 완화 | 2026년 6월 GitHub runner image notice 이후 Windows job은 `windows-2025-vs2026`을 명시합니다. |
 | npm trusted publishing 설정 drift | 외부 잔여 리스크 | 설정은 git이 아니라 npm에 있습니다. release마다 workflow filename, repository, owner, allowed action이 npm package trusted publisher 설정과 맞아야 합니다. |
 | partial publish로 package set 불일치 발생 | 운영 잔여 리스크 | platform package를 wrapper보다 먼저 publish하고, publish 전에 version을 확인합니다. 실패한 version은 이후 patch version으로 수정합니다. |
 | npm 외 release artifact가 아직 unsigned 또는 부재 | npm MVP에서 수용 | npm provenance는 적용됐습니다. GitHub release archive, checksum, 추가 package manager channel은 roadmap 작업입니다. |
