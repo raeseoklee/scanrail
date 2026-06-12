@@ -6,6 +6,7 @@
 
 - Publish a no-functional-change patch release through npm Trusted Publishing.
 - Keep `scanrail` as the recommended npm entrypoint backed by `@scanrail/cli`.
+- Clean up CI and npm publish workflow warnings before the trusted publishing run.
 
 ## 0.1.0 - 2026-06-12
 

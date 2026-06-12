@@ -6,6 +6,7 @@
 
 - npm Trusted Publishing으로 기능 변경 없는 patch release를 publish합니다.
 - `@scanrail/cli`를 내부 wrapper로 유지하고, 사용자가 설치하는 기본 npm entrypoint는 `scanrail`로 둡니다.
+- trusted publishing 실행 전 CI와 npm publish workflow warning을 정리합니다.
 
 ## 0.1.0 - 2026-06-12
 

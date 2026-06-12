@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   test:
     strategy:
@@ -17,11 +20,13 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.26.x"
+          cache: false
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - run: go test ./...
       - run: node packages/npm/cli/test-wrapper.mjs
+      - run: node packages/npm/scanrail/test-wrapper.mjs
 
   release-dry-run:
     runs-on: ubuntu-latest
@@ -30,8 +35,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.26.x"
+          cache: false
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - run: node scripts/build-release.mjs
       - run: npm pack --workspaces --dry-run
