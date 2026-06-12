@@ -5,9 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/raeseoklee/scanrail/internal/app"
 	"github.com/raeseoklee/scanrail/internal/exitcode"
+	"github.com/raeseoklee/scanrail/internal/mcpserver"
 )
 
 func Run(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -29,11 +31,21 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runSetup(args[1:], stdout, stderr)
 	case "run":
 		return runScan(args[1:], stdout, stderr)
+	case "mcp":
+		return runMCP(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintln(stderr, "unknown command:", args[0])
 		usage(stderr)
 		return exitcode.ConfigError
 	}
+}
+
+func runMCP(args []string, stdout io.Writer, stderr io.Writer) int {
+	if len(args) != 1 || args[0] != "serve" {
+		fmt.Fprintln(stderr, "usage: scanrail mcp serve")
+		return exitcode.ConfigError
+	}
+	return mcpserver.Serve(context.Background(), os.Stdin, stdout, stderr)
 }
 
 func runInit(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -90,6 +102,7 @@ Usage:
   scanrail init --non-interactive --project-name demo --target http://localhost:8080
   scanrail setup [--pull-policy never]
   scanrail run [--profile quick] [--only headers]
+  scanrail mcp serve
 
 Options:
   --version    print version

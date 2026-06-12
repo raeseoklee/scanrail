@@ -25,6 +25,9 @@ func TestLoadGeneratedConfig(t *testing.T) {
 	if loaded.TargetURL != "http://localhost:8080" {
 		t.Fatalf("TargetURL = %q", loaded.TargetURL)
 	}
+	if len(loaded.Allowlist) != 1 || loaded.Allowlist[0] != "localhost:8080" {
+		t.Fatalf("Allowlist = %#v", loaded.Allowlist)
+	}
 	if loaded.TokenEnv != "SCANRAIL_TOKEN" {
 		t.Fatalf("TokenEnv = %q", loaded.TokenEnv)
 	}

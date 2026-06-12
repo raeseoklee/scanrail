@@ -1,6 +1,6 @@
 {
   "name": "scanrail",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Developer-first security scan orchestrator",
   "license": "Apache-2.0",
   "repository": {
@@ -20,7 +20,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@scanrail/cli": "0.1.1"
+    "@scanrail/cli": "0.1.2"
   },
   "publishConfig": {
     "access": "public"
@@ -35,6 +35,8 @@
     "trivy",
     "gitleaks",
     "owasp",
-    "cli"
+    "cli",
+    "mcp",
+    "model-context-protocol"
   ]
 }

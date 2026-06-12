@@ -27,6 +27,7 @@ The long-term model is to orchestrate tools such as OWASP ZAP, Nuclei, Semgrep, 
 scanrail init
 scanrail setup
 scanrail run --profile quick
+scanrail mcp serve
 ```
 
 Typical developer flow:
@@ -53,6 +54,14 @@ scanrail run --only headers
 
 The npm package installs a thin JavaScript command wrapper plus the matching Go binary package for macOS, Windows, or Linux. The scoped `@scanrail/cli` package remains available as the underlying wrapper package. Docker-backed Gitleaks, Trivy, and Semgrep adapters are planned next; their real command/output contracts are captured in the [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md).
 
+Run the local MCP server for AI clients that support stdio MCP:
+
+```bash
+scanrail mcp serve
+```
+
+The MCP MVP exposes bounded tools for `doctor`, config reading, latest report summaries, and the native headers scan with explicit active-scan confirmation.
+
 ## Documentation
 
 - [Product Requirements](docs/product-requirements.md)
@@ -71,6 +80,9 @@ The npm package installs a thin JavaScript command wrapper plus the matching Go 
 - [npm Publish Runbook](docs/npm-publish.md)
 - [Release Risk Register](docs/release-risk-register.md)
 - [MCP Design](docs/mcp-design.md)
+- [Demo Tape Scenario](docs/demo-tape-scenario.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
 - [Roadmap](docs/roadmap.md)
 - [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md)
 
@@ -82,6 +94,7 @@ The current first-release candidate supports:
 - `scanrail init --non-interactive`
 - `scanrail setup --pull-policy never`
 - `scanrail run --only headers`
+- `scanrail mcp serve`
 - JSON and HTML report generation
 - npm wrapper package structure
 - platform-specific binary packages for macOS, Windows, and Linux

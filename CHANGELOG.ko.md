@@ -2,6 +2,14 @@
 
 # 변경 기록
 
+## 0.1.2 - 2026-06-12
+
+- local stdio MCP MVP인 `scanrail mcp serve`를 추가합니다.
+- doctor, config read, latest report summary, guarded native headers scan용 MCP tool을 노출합니다.
+- MCP target validation을 위해 generated target allowlist를 parsing합니다.
+- OSS contribution, security, issue template, demo/tape 문서를 추가합니다.
+- npm smoke workflow와 release workflow validation mode를 추가합니다.
+
 ## 0.1.1 - 2026-06-12
 
 - npm Trusted Publishing으로 기능 변경 없는 patch release를 publish합니다.

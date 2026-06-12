@@ -31,14 +31,32 @@ Model Context Protocol은 AI application이 외부 tool, resource, workflow에 �
 - project policy가 명시적으로 허용하지 않는 active scan 없음
 - tool input, output, resource, log, prompt에 secret value 없음
 
+## 0.1.2 MVP 상태
+
+`scanrail mcp serve`에 구현된 항목:
+
+- stdio JSON-RPC server
+- `initialize`와 `ping`
+- `tools/list`와 `tools/call`
+- `resources/list`와 `resources/read`
+- `scanrail_doctor`
+- `scanrail_config_read`
+- `scanrail_report_latest`
+- native headers scanner 전용 `scanrail_run`
+- `scanrail://config`
+- `scanrail://reports/latest/summary`
+- `scanrail://safety-model`
+
+구현은 새 dependency를 추가하지 않고, stdout에는 JSON-RPC message만 출력해야 한다는 MCP stdio transport 요구사항을 따릅니다.
+
 ## 제안 Tool
 
 | Tool | 목적 | Safety note |
 | --- | --- | --- |
 | `scanrail_doctor` | environment readiness 반환 | 일반 CLI check 외에는 read-only |
 | `scanrail_config_read` | normalized project config와 validation warning 반환 | secret reference는 name만 노출 |
-| `scanrail_setup` | local Scanrail state 준비 | 기본은 `--pull-policy never`; image pull은 explicit input 필요 |
-| `scanrail_run` | 제한된 scan profile 실행 | configured target allowlist와 active-scan opt-in 강제 |
+| `scanrail_setup` | local Scanrail state 준비 | setup safety logging 추가 후 구현 예정 |
+| `scanrail_run` | 제한된 scan profile 실행 | native headers만 구현됨; configured target allowlist와 active-scan opt-in 강제 |
 | `scanrail_report_latest` | latest report metadata와 summary 반환 | output size 제한, raw secret 제외 |
 | `scanrail_findings_explain` | finding을 remediation 중심 설명으로 변환 | report data만 사용, 새 scan 실행 없음 |
 
@@ -47,9 +65,9 @@ Model Context Protocol은 AI application이 외부 tool, resource, workflow에 �
 | Resource | 설명 |
 | --- | --- |
 | `scanrail://config` | secret value가 redacted된 현재 project configuration |
-| `scanrail://schema/config` | config schema와 지원 field |
+| `scanrail://schema/config` | config schema와 지원 field. 예정 |
 | `scanrail://reports/latest/summary` | latest report summary |
-| `scanrail://reports/latest/json` | size-limited latest report JSON |
+| `scanrail://reports/latest/json` | size-limited latest report JSON. 예정 |
 | `scanrail://safety-model` | effective safety policy와 allowlist 상태 |
 
 ## Packaging
@@ -61,6 +79,15 @@ scanrail mcp serve
 ```
 
 이 방식은 MCP server를 Go CLI release artifact 안에 유지하므로 새 runtime requirement를 늘리지 않습니다. 구현 시점에도 MCP TypeScript SDK가 가장 성숙한 production surface라면, 이후 `@scanrail/mcp` npm package가 같은 CLI capability를 감싸는 형태를 추가할 수 있습니다.
+
+client command 예시:
+
+```json
+{
+  "command": "scanrail",
+  "args": ["mcp", "serve"]
+}
+```
 
 ## Security Rule
 
@@ -75,12 +102,11 @@ scanrail mcp serve
 
 ## 구현 계획
 
-1. `scanrail mcp serve`를 추가하고 tool/resource registration만 먼저 구현합니다.
-2. config, safety policy, latest report summary용 read-only resource를 노출합니다.
-3. `scanrail_doctor`와 `scanrail_report_latest`를 추가합니다.
-4. 이미 구현된 native headers scanner에 한해 `scanrail_run`을 추가합니다.
-5. JSON-RPC fixture 기반 MCP integration test를 추가합니다.
-6. server가 안정화된 뒤 client configuration example을 문서화합니다.
+1. 주요 host별 MCP client configuration example을 추가합니다.
+2. setup 실행 로그가 추가된 뒤 `scanrail_setup`을 추가합니다.
+3. size limit이 있는 latest report JSON resource를 추가합니다.
+4. finding triage와 remediation planning용 prompt를 추가합니다.
+5. 최소 하나의 production MCP client와 compatibility test를 추가합니다.
 
 ## 비목표
 

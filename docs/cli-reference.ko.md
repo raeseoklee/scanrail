@@ -11,11 +11,14 @@ scanrail doctor
 scanrail init
 scanrail setup
 scanrail run
+scanrail mcp serve
 scanrail update
 scanrail ci init
 scanrail auth setup
 scanrail report open
 ```
+
+현재 구현된 명령은 `doctor`, `init`, `setup`, `run`, `version`, `mcp serve`입니다.
 
 ## 공통 exit code
 
@@ -153,6 +156,38 @@ exit code:
 4  scanner 실행 실패
 5  안전 정책 위반으로 실행 거부
 ```
+
+## scanrail mcp serve
+
+local stdio MCP server를 시작합니다.
+
+```bash
+scanrail mcp serve
+```
+
+구현된 MCP method:
+
+- `initialize`
+- `ping`
+- `tools/list`
+- `tools/call`
+- `resources/list`
+- `resources/read`
+
+노출 tool:
+
+- `scanrail_doctor`
+- `scanrail_config_read`
+- `scanrail_report_latest`
+- `scanrail_run`
+
+안전 동작:
+
+- stdio only, local HTTP listener 없음
+- arbitrary shell execution 없음
+- MVP의 `scanrail_run`은 native `headers` scanner만 지원
+- active scan 실행은 `confirm_active_scan=true` 필요
+- target host는 configured target host 또는 `targets.web.allowlist`와 일치해야 함
 
 ## scanrail update
 

@@ -31,14 +31,32 @@ First MCP release:
 - no active scans unless the project policy explicitly allows them
 - no secret values in tool inputs, outputs, resources, logs, or prompts
 
+## 0.1.2 MVP Status
+
+Implemented in `scanrail mcp serve`:
+
+- stdio JSON-RPC server
+- `initialize` and `ping`
+- `tools/list` and `tools/call`
+- `resources/list` and `resources/read`
+- `scanrail_doctor`
+- `scanrail_config_read`
+- `scanrail_report_latest`
+- `scanrail_run` for the native headers scanner only
+- `scanrail://config`
+- `scanrail://reports/latest/summary`
+- `scanrail://safety-model`
+
+The implementation intentionally avoids a new dependency and follows the MCP stdio transport requirement that stdout contains only JSON-RPC messages.
+
 ## Proposed Tools
 
 | Tool | Purpose | Safety notes |
 | --- | --- | --- |
 | `scanrail_doctor` | Return environment readiness. | Read-only except normal CLI checks. |
 | `scanrail_config_read` | Return normalized project config and validation warnings. | Redact secret references to names only. |
-| `scanrail_setup` | Prepare local Scanrail state. | Default to `--pull-policy never`; image pulls require explicit input. |
-| `scanrail_run` | Run a bounded scan profile. | Enforce configured target allowlists and active-scan opt-in. |
+| `scanrail_setup` | Prepare local Scanrail state. | Planned after setup safety logging is added. |
+| `scanrail_run` | Run a bounded scan profile. | Implemented for native headers only; enforces configured target allowlists and active-scan opt-in. |
 | `scanrail_report_latest` | Return latest report metadata and summary. | Size-limit output and omit raw secrets. |
 | `scanrail_findings_explain` | Convert findings into remediation-oriented text. | Uses report data only; no new scan execution. |
 
@@ -47,9 +65,9 @@ First MCP release:
 | Resource | Description |
 | --- | --- |
 | `scanrail://config` | Current project configuration with secret values redacted. |
-| `scanrail://schema/config` | Config schema and supported fields. |
+| `scanrail://schema/config` | Config schema and supported fields. Planned. |
 | `scanrail://reports/latest/summary` | Latest report summary. |
-| `scanrail://reports/latest/json` | Latest report JSON, size-limited. |
+| `scanrail://reports/latest/json` | Latest report JSON, size-limited. Planned. |
 | `scanrail://safety-model` | Effective safety policy and allowlist state. |
 
 ## Packaging
@@ -61,6 +79,15 @@ scanrail mcp serve
 ```
 
 This keeps the MCP server inside the Go CLI release artifact and avoids introducing a new runtime requirement. If the MCP TypeScript SDK remains the most mature production surface when implementation starts, a later `@scanrail/mcp` npm package can wrap the same CLI capabilities.
+
+Example client command:
+
+```json
+{
+  "command": "scanrail",
+  "args": ["mcp", "serve"]
+}
+```
 
 ## Security Rules
 
@@ -75,12 +102,11 @@ This keeps the MCP server inside the Go CLI release artifact and avoids introduc
 
 ## Implementation Plan
 
-1. Add `scanrail mcp serve` with tool/resource registration and no scan execution.
-2. Expose read-only resources for config, safety policy, and latest report summary.
-3. Add `scanrail_doctor` and `scanrail_report_latest`.
-4. Add `scanrail_run` only for the already implemented native headers scanner.
-5. Add MCP-specific integration tests using JSON-RPC fixtures.
-6. Document client configuration examples after the server is stable.
+1. Add MCP client configuration examples for common hosts.
+2. Add `scanrail_setup` only after setup writes execution logs.
+3. Add bounded latest report JSON with size limits.
+4. Add prompts for finding triage and remediation planning.
+5. Add compatibility tests against at least one production MCP client.
 
 ## Non-Goals
 

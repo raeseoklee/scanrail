@@ -1,0 +1,37 @@
+name: MCP feedback
+description: Report MCP server integration issues or suggestions
+title: "[MCP]: "
+labels: ["mcp", "needs-triage"]
+body:
+  - type: input
+    id: client
+    attributes:
+      label: MCP client or host
+      placeholder: "Claude Desktop, Codex, Cursor, custom client"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Scanrail version
+      placeholder: "0.1.2"
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: MCP configuration
+      description: Redact local paths if needed.
+      render: json
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior
+      description: What tool or resource failed, and what happened?
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety notes
+      description: Did the behavior involve target allowlists, active scan confirmation, or secrets?

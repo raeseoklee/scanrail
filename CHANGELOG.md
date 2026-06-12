@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 0.1.2 - 2026-06-12
+
+- Add `scanrail mcp serve` as a local stdio MCP MVP.
+- Expose MCP tools for doctor, config reading, latest report summaries, and a guarded native headers scan.
+- Parse generated target allowlists for MCP target validation.
+- Add OSS contribution, security, issue template, and demo/tape documentation.
+- Add npm smoke workflow and release workflow validation mode.
+
 ## 0.1.1 - 2026-06-12
 
 - Publish a no-functional-change patch release through npm Trusted Publishing.

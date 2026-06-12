@@ -105,6 +105,7 @@ Completion criteria:
 Goal:
 
 - Let AI coding assistants use Scanrail safely without bypassing the CLI safety model.
+- The first stdio MCP slice shipped early in `0.1.2`; this milestone tracks hardening and broader client compatibility.
 
 Features:
 

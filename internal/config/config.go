@@ -11,11 +11,13 @@ import (
 const DefaultPath = "scanrail.yaml"
 
 type Config struct {
-	ProjectName string
-	TargetURL   string
-	TokenEnv    string
-	OutputDir   string
-	FailOn      string
+	ProjectName       string
+	TargetURL         string
+	Allowlist         []string
+	TokenEnv          string
+	OutputDir         string
+	FailOn            string
+	ActiveScanDefault bool
 }
 
 func Defaults(workdir string) Config {
@@ -50,12 +52,20 @@ func Load(path string, workdir string) (Config, error) {
 	for scanner.Scan() {
 		raw := scanner.Text()
 		line := strings.TrimSpace(raw)
-		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "- ") {
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 		indent := leadingSpaces(raw) / 2
 		if indent < 0 {
 			indent = 0
+		}
+		if strings.HasPrefix(line, "- ") {
+			value := cleanValue(strings.TrimPrefix(line, "- "))
+			switch strings.Join(stack, ".") {
+			case "targets.web.allowlist":
+				cfg.Allowlist = append(cfg.Allowlist, value)
+			}
+			continue
 		}
 		if strings.HasSuffix(line, ":") {
 			key := strings.TrimSuffix(line, ":")
@@ -80,6 +90,8 @@ func Load(path string, workdir string) (Config, error) {
 			cfg.OutputDir = value
 		case "policy.fail_on.severity":
 			cfg.FailOn = value
+		case "safety.active_scan_default":
+			cfg.ActiveScanDefault = value == "true"
 		}
 	}
 	if err := scanner.Err(); err != nil {

@@ -1,0 +1,37 @@
+name: Scanner adapter request
+description: Propose or improve an open-source scanner adapter
+title: "[Adapter]: "
+labels: ["adapter", "needs-triage"]
+body:
+  - type: input
+    id: scanner
+    attributes:
+      label: Scanner
+      placeholder: "OWASP ZAP, Nuclei, Semgrep, Trivy, Gitleaks"
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Developer workflow
+      description: Describe where this scanner should run and what it should prove.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Proposed command or container image
+      description: Include version pinning when known.
+      render: shell
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety controls
+      description: Target allowlist, auth handling, rate limits, blocked paths, and active-scan behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output mapping
+      description: Explain the raw output format and normalized findings you expect.

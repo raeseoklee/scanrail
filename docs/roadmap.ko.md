@@ -128,6 +128,7 @@
 목표:
 
 - AI coding assistant가 Scanrail CLI의 safety model을 우회하지 않고 Scanrail을 안전하게 사용할 수 있게 한다.
+- 첫 stdio MCP slice는 `0.1.2`에서 먼저 제공되었고, 이 milestone은 hardening과 client compatibility 확장을 추적한다.
 
 기능:
 

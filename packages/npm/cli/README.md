@@ -30,6 +30,16 @@ scanrail run --only headers
 
 The first release candidate includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, and a native security headers scanner. Docker-backed adapters for Gitleaks, Trivy, and Semgrep are planned next.
 
+## MCP
+
+Scanrail includes a local stdio MCP server for AI clients:
+
+```bash
+scanrail mcp serve
+```
+
+The MCP MVP exposes bounded tools for `doctor`, config reading, latest report summaries, and the native headers scan with explicit active-scan confirmation.
+
 ## Package Layout
 
 `scanrail` is the recommended npm entrypoint. `@scanrail/cli` is the underlying scoped wrapper package and installs one optional platform package:
@@ -46,6 +56,7 @@ The first release candidate includes the CLI scaffold, config generation, worksp
 - Repository: https://github.com/raeseoklee/scanrail
 - Documentation: https://github.com/raeseoklee/scanrail#readme
 - Issues: https://github.com/raeseoklee/scanrail/issues
+- Security: https://github.com/raeseoklee/scanrail/blob/main/SECURITY.md
 
 ## License
 

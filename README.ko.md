@@ -25,6 +25,7 @@
 scanrail init
 scanrail setup
 scanrail run --profile quick
+scanrail mcp serve
 ```
 
 개발자 관점의 기본 흐름은 다음과 같습니다.
@@ -51,6 +52,14 @@ scanrail run --only headers
 
 npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go binary package를 설치합니다. scoped `@scanrail/cli` package는 내부 wrapper package로 계속 사용할 수 있습니다. Docker 기반 Gitleaks, Trivy, Semgrep adapter는 다음 구현 대상이며, 실제 command/output 계약은 [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)에 남겨두었습니다.
 
+stdio MCP를 지원하는 AI client에서는 local MCP server를 실행할 수 있습니다.
+
+```bash
+scanrail mcp serve
+```
+
+MCP MVP는 `doctor`, config read, latest report summary, 그리고 명시적 active-scan 확인이 필요한 native headers scan tool을 제공합니다.
+
 ## 문서
 
 - [제품 요구사항](docs/product-requirements.ko.md)
@@ -69,6 +78,9 @@ npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go b
 - [npm Publish Runbook](docs/npm-publish.ko.md)
 - [릴리스 리스크 레지스터](docs/release-risk-register.ko.md)
 - [MCP 설계](docs/mcp-design.ko.md)
+- [Demo Tape Scenario](docs/demo-tape-scenario.ko.md)
+- [기여 가이드](CONTRIBUTING.ko.md)
+- [보안 정책](SECURITY.ko.md)
 - [로드맵](docs/roadmap.ko.md)
 - [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)
 
@@ -80,6 +92,7 @@ npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go b
 - `scanrail init --non-interactive`
 - `scanrail setup --pull-policy never`
 - `scanrail run --only headers`
+- `scanrail mcp serve`
 - JSON, HTML 리포트 생성
 - macOS, Windows, Linux용 npm wrapper와 platform binary package
 - release dry-run 자동화

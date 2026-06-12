@@ -11,6 +11,7 @@ scanrail doctor
 scanrail init
 scanrail setup
 scanrail run
+scanrail mcp serve
 scanrail update
 scanrail ci init
 scanrail auth setup
@@ -18,6 +19,7 @@ scanrail report open
 ```
 
 The first release candidate implements `doctor`, `init`, `setup`, `run`, and `version`.
+Version `0.1.2` also implements the stdio MCP server through `mcp serve`.
 
 ## Common Exit Codes
 
@@ -137,6 +139,38 @@ scanrail --version
 ```
 
 Build metadata is injected through Go linker flags during release builds.
+
+## `scanrail mcp serve`
+
+Starts the local stdio MCP server.
+
+```bash
+scanrail mcp serve
+```
+
+Implemented MCP methods:
+
+- `initialize`
+- `ping`
+- `tools/list`
+- `tools/call`
+- `resources/list`
+- `resources/read`
+
+Exposed tools:
+
+- `scanrail_doctor`
+- `scanrail_config_read`
+- `scanrail_report_latest`
+- `scanrail_run`
+
+Safety behavior:
+
+- stdio only; no local HTTP listener
+- no arbitrary shell execution
+- `scanrail_run` only supports the native `headers` scanner in the MVP
+- active scan execution requires `confirm_active_scan=true`
+- target host must match the configured target host or `targets.web.allowlist`
 
 ## Planned Commands
 

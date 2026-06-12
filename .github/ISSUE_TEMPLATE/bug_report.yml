@@ -1,0 +1,60 @@
+name: Bug report
+description: Report a reproducible Scanrail bug
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include real secrets, private target URLs, or exploitable vulnerability details. Use the security policy for sensitive reports.
+  - type: input
+    id: version
+    attributes:
+      label: Scanrail version
+      description: Run `scanrail version`.
+      placeholder: "0.1.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS arm64
+        - macOS x64
+        - Windows x64
+        - Windows arm64
+        - Linux x64
+        - Linux arm64
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use a synthetic target or sanitized fixture.
+      placeholder: |
+        1. npm install -g scanrail
+        2. scanrail init ...
+        3. scanrail run ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Remove secrets and private URLs before pasting.
+      render: text
