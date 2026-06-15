@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/raeseoklee/scanrail/internal/app"
+	"github.com/raeseoklee/scanrail/internal/audit"
 	"github.com/raeseoklee/scanrail/internal/config"
 	"github.com/raeseoklee/scanrail/internal/exitcode"
 	"github.com/raeseoklee/scanrail/internal/report"
@@ -238,13 +239,39 @@ func (s server) runHeaders(ctx context.Context, args json.RawMessage) (any, *rpc
 		return nil, &rpcError{Code: -32602, Message: "Invalid params", Data: err.Error()}
 	}
 	if opts.Only != "" && opts.Only != "headers" {
-		return errorToolResult("MCP MVP only supports the native headers scanner."), nil
+		reason := "MCP MVP only supports the native headers scanner."
+		_ = s.writeMCPAudit(audit.Event{
+			Action:   "scanrail_run",
+			Tool:     opts.Only,
+			Decision: "denied",
+			Reason:   reason,
+			Target:   opts.Target,
+			Profile:  opts.Profile,
+		}, safety.DefaultRedactor())
+		return errorToolResult(reason), nil
 	}
 	if !opts.ConfirmActiveScan {
-		return errorToolResult("scanrail_run requires confirm_active_scan=true because it sends an HTTP request to the target."), nil
+		reason := "scanrail_run requires confirm_active_scan=true because it sends an HTTP request to the target."
+		_ = s.writeMCPAudit(audit.Event{
+			Action:   "scanrail_run",
+			Tool:     scanTool(opts.Only),
+			Decision: "denied",
+			Reason:   reason,
+			Target:   opts.Target,
+			Profile:  opts.Profile,
+		}, safety.DefaultRedactor())
+		return errorToolResult(reason), nil
 	}
 	cfg, err := config.Load(configPath(opts.ConfigPath, s.workdir), s.workdir)
 	if err != nil {
+		_ = s.writeMCPAudit(audit.Event{
+			Action:   "scanrail_run",
+			Tool:     scanTool(opts.Only),
+			Decision: "denied",
+			Reason:   "could not read config: " + err.Error(),
+			Target:   opts.Target,
+			Profile:  opts.Profile,
+		}, safety.DefaultRedactor())
 		return nil, &rpcError{Code: -32603, Message: "Could not read config", Data: err.Error()}
 	}
 	redactor := safety.NewRedactorFromEnv(cfg.TokenEnv)
@@ -253,7 +280,30 @@ func (s server) runHeaders(ctx context.Context, args json.RawMessage) (any, *rpc
 		target = cfg.TargetURL
 	}
 	if err := allowedTarget(cfg, target); err != nil {
+		_ = s.writeMCPAudit(audit.Event{
+			Action:     "scanrail_run",
+			Tool:       "headers",
+			Decision:   "denied",
+			Reason:     err.Error(),
+			Project:    cfg.ProjectName,
+			Target:     target,
+			TargetHost: targetHostOrEmpty(target),
+			Profile:    opts.Profile,
+		}, redactor)
 		return errorToolResult(err.Error()), nil
+	}
+	started := audit.Event{
+		Action:     "scanrail_run",
+		Tool:       "headers",
+		Decision:   "started",
+		Project:    cfg.ProjectName,
+		Target:     target,
+		TargetHost: targetHostOrEmpty(target),
+		Profile:    opts.Profile,
+	}
+	if err := s.writeMCPAudit(started, redactor); err != nil {
+		message := "scanrail_run could not write audit log; refusing to execute active scan."
+		return errorToolResult(redactor.RedactString(message + " " + err.Error())), nil
 	}
 	var out bytes.Buffer
 	code := app.Run(ctx, app.RunOptions{
@@ -263,11 +313,25 @@ func (s server) runHeaders(ctx context.Context, args json.RawMessage) (any, *rpc
 		Only:       "headers",
 		OutputDir:  opts.OutputDir,
 	}, &out)
+	completed := started
+	completed.Decision = "completed"
+	completed.ExitCode = &code
+	auditErr := s.writeMCPAudit(completed, redactor)
 	redactedOutput := redactor.RedactString(out.String())
 	result := map[string]any{
 		"exit_code": code,
 		"output":    strings.TrimSpace(redactedOutput),
 	}
+	if auditErr != nil {
+		result["audit_logged"] = false
+		result["audit_log_error"] = redactor.RedactString(auditErr.Error())
+		return toolResult{
+			Content:           []textContent{{Type: "text", Text: redactedOutput + "\naudit log failed after scan completion"}},
+			IsError:           true,
+			StructuredContent: result,
+		}, nil
+	}
+	result["audit_logged"] = true
 	if code != exitcode.OK {
 		return toolResult{
 			Content:           []textContent{{Type: "text", Text: redactedOutput}},
@@ -592,5 +656,30 @@ func safetyModelText() string {
 - Active scan execution requires ` + "`confirm_active_scan=true`" + `.
 - Scan targets must match the configured target host or ` + "`targets.web.allowlist`" + `.
 - Secret values are not accepted in MCP inputs or returned through MCP resources.
+- MCP-triggered scan attempts are recorded in ` + "`.scanrail/logs/mcp-audit.jsonl`" + `.
 - Reports are summarized by default instead of streaming unbounded raw output.`)
+}
+
+func (s server) auditLogPath() string {
+	return filepath.Join(s.workdir, ".scanrail", "logs", "mcp-audit.jsonl")
+}
+
+func (s server) writeMCPAudit(event audit.Event, redactor safety.Redactor) error {
+	event.Source = "mcp"
+	return audit.Append(s.auditLogPath(), event, redactor)
+}
+
+func scanTool(value string) string {
+	if value == "" {
+		return "headers"
+	}
+	return value
+}
+
+func targetHostOrEmpty(raw string) string {
+	host, err := hostname(raw)
+	if err != nil {
+		return ""
+	}
+	return host
 }

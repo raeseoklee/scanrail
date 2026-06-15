@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -120,6 +122,56 @@ func TestLatestReportResourceRedactsSecretQuery(t *testing.T) {
 	}
 	if !strings.Contains(reportText, "[REDACTED]") {
 		t.Fatalf("latest report resource missing redaction marker: %s", reportText)
+	}
+}
+
+func TestRunToolWritesRedactedAuditLog(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Security-Policy", "default-src 'self'")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(targetServer.Close)
+
+	target := targetServer.URL + "/?token=supersecret"
+	cfg := config.Defaults(dir)
+	cfg.ProjectName = "demo"
+	cfg.TargetURL = target
+	if err := config.WriteInitial("scanrail.yaml", cfg, false); err != nil {
+		t.Fatal(err)
+	}
+
+	input := strings.Join([]string{
+		`{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"scanrail_run","arguments":{"only":"headers","target":"` + target + `"}}}`,
+		`{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"scanrail_run","arguments":{"only":"headers","target":"` + target + `","confirm_active_scan":true}}}`,
+	}, "\n") + "\n"
+	var out bytes.Buffer
+	if code := Serve(context.Background(), strings.NewReader(input), &out, ioDiscard{}); code != 0 {
+		t.Fatalf("Serve exit code = %d", code)
+	}
+	if !strings.Contains(out.String(), `"audit_logged":true`) {
+		t.Fatalf("successful scan result should report audit logging: %s", out.String())
+	}
+
+	data, err := os.ReadFile(filepath.Join(dir, ".scanrail", "logs", "mcp-audit.jsonl"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	logText := string(data)
+	for _, want := range []string{`"decision":"denied"`, `"decision":"started"`, `"decision":"completed"`, `"exit_code":0`} {
+		if !strings.Contains(logText, want) {
+			t.Fatalf("audit log missing %s: %s", want, logText)
+		}
+	}
+	if strings.Contains(logText, "supersecret") {
+		t.Fatalf("audit log leaked target secret: %s", logText)
+	}
+	if !strings.Contains(logText, "[REDACTED]") {
+		t.Fatalf("audit log missing redaction marker: %s", logText)
 	}
 }
 

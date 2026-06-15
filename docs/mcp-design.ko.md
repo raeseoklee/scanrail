@@ -100,12 +100,12 @@ client command 예시:
 - MCP client를 통한 token passthrough를 금지하고, credential은 environment 소유로 둡니다.
 - secret value를 redact하고 큰 report payload를 제한합니다.
 - MCP tool description은 user-facing documentation일 뿐 authorization으로 취급하지 않습니다.
-- scan 또는 setup을 실행하는 tool call은 Scanrail log에 남깁니다.
+- scan/setup tool call은 local audit log에 남깁니다. MVP는 MCP scan attempt를 `.scanrail/logs/mcp-audit.jsonl`에 기록합니다.
 
 ## 구현 계획
 
 1. 주요 host별 MCP client configuration example을 추가합니다.
-2. setup 실행 로그가 추가된 뒤 `scanrail_setup`을 추가합니다.
+2. setup audit log가 추가된 뒤 `scanrail_setup`을 추가합니다.
 3. size limit이 있는 latest report JSON resource를 추가합니다.
 4. finding triage와 remediation planning용 prompt를 추가합니다.
 5. 최소 하나의 production MCP client와 compatibility test를 추가합니다.

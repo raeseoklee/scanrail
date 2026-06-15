@@ -188,6 +188,7 @@ scanrail mcp serve
 - MVP의 `scanrail_run`은 native `headers` scanner만 지원
 - active scan 실행은 `confirm_active_scan=true` 필요
 - target host는 configured target host 또는 `targets.web.allowlist`와 일치해야 함
+- MCP-triggered scan attempt는 `.scanrail/logs/mcp-audit.jsonl`에 기록됨
 
 ## scanrail update
 

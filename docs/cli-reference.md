@@ -171,6 +171,7 @@ Safety behavior:
 - `scanrail_run` only supports the native `headers` scanner in the MVP
 - active scan execution requires `confirm_active_scan=true`
 - target host must match the configured target host or `targets.web.allowlist`
+- MCP-triggered scan attempts are recorded in `.scanrail/logs/mcp-audit.jsonl`
 
 ## Planned Commands
 

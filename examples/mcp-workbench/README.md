@@ -4,7 +4,7 @@
 
 This fixture verifies `scanrail mcp serve` with `mcp-workbench`.
 
-It starts a local HTTP target, writes a temporary `scanrail.yaml`, builds the current Scanrail binary, and exposes the MCP server over stdio. The test spec validates discovery, resources, safety gating, a confirmed native headers scan, and latest report summary retrieval.
+It starts a local HTTP target, writes a temporary `scanrail.yaml`, builds the current Scanrail binary, and exposes the MCP server over stdio. The test spec validates discovery, resources, safety gating, a confirmed native headers scan, audit logging status, and latest report summary retrieval.
 
 Run:
 

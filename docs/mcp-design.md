@@ -100,12 +100,12 @@ Example client command:
 - Never pass tokens through the MCP client; credentials remain environment-owned.
 - Redact secret values and limit large report payloads.
 - Treat MCP tool descriptions as user-facing documentation, not as authorization.
-- Record tool calls in Scanrail logs when they execute scans or setup.
+- Record scan/setup tool calls in local audit logs. The MVP writes MCP scan attempts to `.scanrail/logs/mcp-audit.jsonl`.
 
 ## Implementation Plan
 
 1. Add MCP client configuration examples for common hosts.
-2. Add `scanrail_setup` only after setup writes execution logs.
+2. Add `scanrail_setup` only after setup writes audit logs.
 3. Add bounded latest report JSON with size limits.
 4. Add prompts for finding triage and remediation planning.
 5. Add compatibility tests against at least one production MCP client.

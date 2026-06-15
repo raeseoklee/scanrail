@@ -226,7 +226,9 @@ Authorization: Bearer [REDACTED]
 Cookie: SESSION=[REDACTED]
 ```
 
-현재 구현은 `internal/safety`의 central redactor를 사용하며 report JSON/HTML persistence와 MCP report/run output 전에 masking합니다. 이후 raw scanner artifact와 SARIF output을 노출할 때도 같은 boundary를 반드시 통과해야 합니다.
+현재 구현은 `internal/safety`의 central redactor를 사용하며 report JSON/HTML persistence, MCP report/run output, MCP audit event 전에 masking합니다. 이후 raw scanner artifact와 SARIF output을 노출할 때도 같은 boundary를 반드시 통과해야 합니다.
+
+MCP-triggered scan attempt는 JSON Lines 형식으로 `.scanrail/logs/mcp-audit.jsonl`에 기록됩니다. denied, started, completed event에는 tool, decision, redacted target, target host, profile, 가능한 경우 exit code가 포함됩니다.
 
 ## 실패 우선 원칙
 

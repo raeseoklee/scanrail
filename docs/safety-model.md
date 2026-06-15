@@ -117,7 +117,9 @@ auth:
   token: raw-secret-value
 ```
 
-All logs, raw command previews, and reports must redact secret values. The current implementation centralizes masking in `internal/safety` and applies it before report JSON/HTML persistence and MCP report/run outputs. Future raw scanner artifacts and SARIF output must pass through the same boundary before being exposed.
+All logs, raw command previews, and reports must redact secret values. The current implementation centralizes masking in `internal/safety` and applies it before report JSON/HTML persistence, MCP report/run outputs, and MCP audit events. Future raw scanner artifacts and SARIF output must pass through the same boundary before being exposed.
+
+MCP-triggered scan attempts are written to `.scanrail/logs/mcp-audit.jsonl` as JSON Lines. Denied, started, and completed events include the tool, decision, redacted target, target host, profile, and exit code when available.
 
 ## Exit Codes
 

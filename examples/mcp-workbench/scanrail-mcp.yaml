@@ -126,6 +126,9 @@ tests:
       - kind: equals
         path: $.structuredContent.exit_code
         value: 0
+      - kind: equals
+        path: $.structuredContent.audit_logged
+        value: true
       - kind: jsonpath
         path: $.structuredContent.output
         contains: Scanrail completed
