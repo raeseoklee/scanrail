@@ -1,21 +1,70 @@
 [ENGLISH](release-risk-register.md) | [한국어](release-risk-register.ko.md)
 
-# Release Risk Register
+# Release and Product Risk Register
 
-This register tracks release risks that remain after the first npm publication and the `0.1.1` trusted publishing verification.
+This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, and the MCP Workbench verification pass.
 
-## Current Status
+Last reviewed: June 15, 2026.
 
-| Risk | Status | Mitigation |
+## Risk Levels
+
+| Level | Meaning |
+| --- | --- |
+| High | Can block release adoption, create unsafe scan behavior, or break public package trust. |
+| Medium | Can confuse users, reduce reliability, or delay the next milestone if not managed. |
+| Low | Known gap with limited blast radius or clear manual workaround. |
+
+## Current Snapshot
+
+| Area | Status | Main remaining risk |
 | --- | --- | --- |
-| GitHub Actions Node 20 runtime deprecation warnings | Mitigated | Workflows use `actions/checkout@v5`, `actions/setup-node@v5`, and `actions/setup-go@v6`, which declare `node24` action runtimes. |
-| npm `always-auth` warning during publish workflow | Mitigated | The publish workflow no longer asks `setup-node` to create npm registry auth configuration. Trusted publishing uses OIDC instead of `.npmrc` token auth. |
-| Published package does not run on every target OS | Mitigated by workflow | `.github/workflows/npm-smoke.yml` installs the public `scanrail` package on Ubuntu, macOS, and Windows, then runs `version`, `doctor`, and `npm audit signatures`. |
-| Windows hosted runner label migration | Mitigated | Windows jobs pin `windows-2025-vs2026` explicitly after the June 2026 GitHub runner image notice. |
-| Trusted publishing settings drift in npm | Residual external risk | Settings live in npm, not git. Each release must keep the workflow filename, repository, owner, and allowed action aligned with the npm package trusted publisher configuration. |
-| Partial publish leaves package set inconsistent | Residual operational risk | Platform packages publish before wrappers, package versions are checked before publish, and failed versions must be fixed with a later patch version. |
-| Release artifacts outside npm are unsigned or absent | Accepted for npm MVP | npm provenance is in place. GitHub release archives, checksums, and optional package-manager channels remain roadmap work. |
-| Scanner adapters can expand network or credential exposure | Product safety risk | Active scans stay opt-in, target allowlists are enforced, and secrets are referenced by environment variable names rather than values. |
+| npm distribution | Stable for MVP | Trusted publisher settings and npm package state live outside git. |
+| Cross-platform install | Covered by smoke workflow | Public npm smoke is scheduled/manual, not run on every commit. |
+| MCP MVP | Implemented and Workbench-verified | Real host compatibility and MCP security hardening are not complete. |
+| Scanner adapters | Proven by spike only | Docker runner, adapter contracts, redaction, and safety gates are not production code yet. |
+| Reporting | JSON/HTML for native headers | Multi-scanner normalization, SARIF, and false-positive workflow are still planned. |
+| OSS operations | Public repo is usable | Community triage, support boundaries, and governance are still lightweight. |
+
+## Immediate Priorities
+
+1. Close adapter safety and redaction gaps before shipping Docker-backed scanners in default profiles (`R-009`, `R-013`).
+2. Harden MCP resources, audit logs, and host compatibility before adding broader MCP execution tools (`R-005`, `R-007`, `R-008`).
+3. Add a release checklist that captures npm package state before and after each publish (`R-001`, `R-002`).
+4. Preserve raw scanner evidence and version metadata before expanding normalized reports (`R-011`, `R-012`).
+5. Treat SARIF as a required milestone before positioning Scanrail as a PR-native security gate (`R-016`).
+
+## Active Risks
+
+| ID | Risk | Level | Status | Mitigation | Next action |
+| --- | --- | --- | --- | --- | --- |
+| R-001 | npm trusted publishing settings drift | High | Residual external risk | Settings live in npm, not git. Release docs record the required workflow filename, repository, owner, and allowed action. | Before each publish, validate all package trusted publisher settings against `.github/workflows/npm-publish.yml`. |
+| R-002 | Partial publish leaves package set inconsistent | High | Residual operational risk | Platform packages publish before wrappers, versions are checked before publish, and failed versions must be fixed with a later patch version. | Add a release checklist item that records package versions before and after publish. |
+| R-003 | Release artifacts outside npm are unsigned or absent | Medium | Accepted for npm MVP | npm provenance is in place. GitHub release archives, checksums, and additional package-manager channels remain roadmap work. | Add checksum and GitHub release asset generation before declaring a stable `v1.0` release path. |
+| R-004 | Public npm smoke does not run on every commit | Medium | Partially mitigated | `.github/workflows/npm-smoke.yml` covers Ubuntu, macOS, and Windows against the public registry on schedule or manual dispatch. | Decide whether to add a lightweight post-publish required smoke gate for release branches. |
+| R-005 | MCP server compatibility is narrower than the client ecosystem | Medium | Partially mitigated | `mcp-workbench inspect` and the Workbench regression spec validate stdio protocol behavior. | Add smoke notes or fixtures for at least one production MCP host before expanding MCP tools. |
+| R-006 | MCP tools could bypass CLI safety if they diverge from core policy | High | Controlled by design | MCP stays a thin adapter over the CLI safety model, active scans require `confirm_active_scan=true`, and allowlists are enforced. | Keep MCP tool implementations bound to the same config, exit-code, and safety validation paths as CLI execution. |
+| R-007 | MCP resources can leak sensitive configuration or oversized report data | High | Partially mitigated | Current config resources expose secret environment variable names, not values. Planned full report resources are still deferred. | Add size limits and redaction tests before adding `scanrail://reports/latest/json` or richer resources. |
+| R-008 | MCP tool calls are not yet auditable enough for team environments | Medium | Known gap | The design requires scan/setup tool calls to be recorded, but audit logging is not yet a complete product feature. | Add local execution log entries for MCP-triggered scans before adding `scanrail_setup` or broader scanner execution. |
+| R-009 | Scanner adapters can expand network or credential exposure | High | Product safety risk | Active scans stay opt-in, target allowlists are enforced, secrets are referenced by environment variable names, and adapter capabilities are documented. | Implement adapter capability metadata and fail/skip behavior before shipping Docker-backed scanners in default profiles. |
+| R-010 | Docker-backed scanners can behave differently across host OSes | Medium | Spike validated only | The scanner adapter spike proved command shapes and outputs in one Docker environment, not a full OS matrix. | Run adapter integration tests on Linux first, then add macOS/Windows Docker compatibility notes or matrix coverage. |
+| R-011 | Scanner image or rule updates can change findings unexpectedly | Medium | Known gap | Spike images are pinned. Production adapter versioning and update policy are not implemented. | Pin default scanner images/templates and record versions in every report. |
+| R-012 | Normalized reports can hide scanner-specific context | Medium | Known gap | The spike preserves raw outputs and normalizes core fields. Production report schema is still evolving. | Store raw artifacts separately and link normalized findings back to scanner, rule, evidence, and remediation fields. |
+| R-013 | Secret redaction may miss raw scanner output paths | High | Known gap | Product docs require redaction, and the spike identifies raw artifact capture as an implementation implication. | Add central redaction before exposing logs, raw artifacts, MCP resources, HTML, JSON, or future SARIF. |
+| R-014 | Users may overestimate coverage from the current native headers scan | Medium | Documentation risk | README and docs state that the MVP is not commercial scanner parity and Docker-backed adapters are planned. | Keep capability and non-goal language visible in README, reports, and release notes. |
+| R-015 | Findings workflow is not ready for team-scale accepted risk management | Medium | Roadmap item | Ignore rules, policy packs, issue export, and workflow integrations are listed for later milestones. | Implement expiring ignore rules before adding severity override or team policy features. |
+| R-016 | SARIF and CI artifact integrations are not shipped yet | Low | Planned | CI/CD milestone includes SARIF, JUnit XML, and CI templates. | Treat SARIF as required before positioning Scanrail as a PR-native security gate. |
+| R-017 | OSS support and governance can lag adoption | Medium | Lightweight process | Contributing, security policy, issue templates, and roadmap exist. | Add maintainer response expectations and label workflow once external issues start arriving. |
+| R-018 | License and attribution obligations for bundled scanner rules/templates can be missed | Medium | Future integration risk | The current package does not bundle third-party scanner rule packs. | Track license metadata when adding bundled Semgrep/Nuclei/config assets. |
+
+## Mitigated Risks
+
+| Risk | Mitigation |
+| --- | --- |
+| GitHub Actions Node 20 runtime deprecation warnings | Workflows use `actions/checkout@v5`, `actions/setup-node@v5`, and `actions/setup-go@v6`, which declare `node24` action runtimes. |
+| npm `always-auth` warning during publish workflow | The publish workflow no longer asks `setup-node` to create npm registry auth configuration. Trusted publishing uses OIDC instead of `.npmrc` token auth. |
+| Published package does not run on every target OS | The npm smoke workflow installs the public `scanrail` package on Ubuntu, macOS, and Windows, then runs `version`, `doctor`, and signature audit checks. |
+| Windows hosted runner label migration | Windows jobs pin `windows-2025-vs2026` explicitly after the June 2026 GitHub runner image notice. |
+| MCP MVP lacks real client-style regression coverage | `examples/mcp-workbench/scanrail-mcp.yaml` now verifies MCP discovery, resources, safety gating, confirmed native headers scan execution, and latest report retrieval. |
 
 ## Verification Gates
 
@@ -37,10 +86,19 @@ npm view scanrail version
 npm run smoke:npm -- <version>
 ```
 
-Run the `npm Smoke` workflow for OS matrix validation.
+Run the `npm Smoke` workflow for OS matrix validation against the public npm registry.
+
+MCP regression check:
+
+```bash
+mcp-workbench inspect --command node --args "examples/mcp-workbench/serve-fixture.mjs" --json
+mcp-workbench run examples/mcp-workbench/scanrail-mcp.yaml --verbose
+```
 
 ## External Checks
 
-- Confirm npm trusted publisher settings for every package before changing the workflow filename or repository owner.
+- Confirm npm trusted publisher settings for every package before changing the workflow filename, repository owner, or npm organization settings.
 - Confirm package pages show provenance for the published version.
 - Confirm GitHub Actions has no deprecation or auth warnings after workflow changes.
+- Confirm scanner image licenses, rule licenses, and update policies before bundling third-party scanner assets.
+- Confirm MCP host behavior with at least one production AI client before expanding MCP execution tools.
