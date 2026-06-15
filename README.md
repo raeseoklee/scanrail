@@ -79,6 +79,7 @@ The stdio MCP path can be regression-tested with [MCP Workbench](examples/mcp-wo
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
 - [npm Publish Runbook](docs/npm-publish.md)
+- [Release Notes 0.1.3](docs/releases/0.1.3.md)
 - [Release Checklist](docs/release-checklist.md)
 - [Release Risk Register](docs/release-risk-register.md)
 - [Risk Treatment Plan](docs/risk-treatment-plan.md)

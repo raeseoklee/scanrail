@@ -2,6 +2,15 @@
 
 # Changelog
 
+## 0.1.3 - 2026-06-15
+
+- Add MCP Workbench regression evidence and connect the MCP and scanner demo tapes in the public docs.
+- Record MCP scan attempts in the audit log so active-scan requests leave reviewable local evidence.
+- Centralize target redaction and scanner capability metadata to avoid leaking raw targets or silently weakening safety policy.
+- Stabilize the Windows CI runner selection used by the npm smoke path.
+- Convert the remaining release risks into explicit release, MCP expansion, scanner adapter, and roadmap gates.
+- Add bilingual release checklist and risk treatment documentation for future npm publishes.
+
 ## 0.1.2 - 2026-06-12
 
 - Add `scanrail mcp serve` as a local stdio MCP MVP.

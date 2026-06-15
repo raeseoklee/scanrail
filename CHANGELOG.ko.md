@@ -2,6 +2,15 @@
 
 # 변경 기록
 
+## 0.1.3 - 2026-06-15
+
+- MCP Workbench 회귀 검증 근거를 추가하고, MCP 및 scanner demo tape를 공개 문서에 연결합니다.
+- active scan 요청이 로컬에서 검토 가능한 근거를 남기도록 MCP scan attempt를 audit log에 기록합니다.
+- raw target 노출과 조용한 safety policy 약화를 막기 위해 target redaction과 scanner capability metadata를 중앙화합니다.
+- npm smoke 경로에서 사용하는 Windows CI runner 선택을 안정화합니다.
+- 남은 release risk를 release, MCP expansion, scanner adapter, roadmap gate로 명시적으로 전환합니다.
+- 이후 npm publish를 위한 영문/국문 release checklist와 risk treatment 문서를 추가합니다.
+
 ## 0.1.2 - 2026-06-12
 
 - local stdio MCP MVP인 `scanrail mcp serve`를 추가합니다.
