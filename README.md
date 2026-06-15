@@ -61,6 +61,7 @@ scanrail mcp serve
 ```
 
 The MCP MVP exposes bounded tools for `doctor`, config reading, latest report summaries, and the native headers scan with explicit active-scan confirmation.
+The stdio MCP path can be regression-tested with [MCP Workbench](examples/mcp-workbench/README.md).
 
 ## Documentation
 
@@ -80,6 +81,7 @@ The MCP MVP exposes bounded tools for `doctor`, config reading, latest report su
 - [npm Publish Runbook](docs/npm-publish.md)
 - [Release Risk Register](docs/release-risk-register.md)
 - [MCP Design](docs/mcp-design.md)
+- [MCP Workbench Verification](examples/mcp-workbench/README.md)
 - [Demo Tape Scenario](docs/demo-tape-scenario.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security Policy](SECURITY.md)

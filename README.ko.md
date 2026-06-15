@@ -59,6 +59,7 @@ scanrail mcp serve
 ```
 
 MCP MVP는 `doctor`, config read, latest report summary, 그리고 명시적 active-scan 확인이 필요한 native headers scan tool을 제공합니다.
+stdio MCP 경로는 [MCP Workbench 검증](examples/mcp-workbench/README.ko.md)으로 회귀 테스트할 수 있습니다.
 
 ## 문서
 
@@ -78,6 +79,7 @@ MCP MVP는 `doctor`, config read, latest report summary, 그리고 명시적 act
 - [npm Publish Runbook](docs/npm-publish.ko.md)
 - [릴리스 리스크 레지스터](docs/release-risk-register.ko.md)
 - [MCP 설계](docs/mcp-design.ko.md)
+- [MCP Workbench 검증](examples/mcp-workbench/README.ko.md)
 - [Demo Tape Scenario](docs/demo-tape-scenario.ko.md)
 - [기여 가이드](CONTRIBUTING.ko.md)
 - [보안 정책](SECURITY.ko.md)

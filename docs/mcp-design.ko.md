@@ -49,6 +49,8 @@ Model Context Protocol은 AI application이 외부 tool, resource, workflow에 �
 
 구현은 새 dependency를 추가하지 않고, stdout에는 JSON-RPC message만 출력해야 한다는 MCP stdio transport 요구사항을 따릅니다.
 
+Compatibility regression coverage는 [MCP Workbench 검증](../examples/mcp-workbench/README.ko.md) fixture에 남깁니다. 이 fixture는 실제 stdio MCP client harness로 discovery, resource, active-scan safety gate, confirmed native headers scan, latest report summary retrieval을 검증합니다.
+
 ## 제안 Tool
 
 | Tool | 목적 | Safety note |

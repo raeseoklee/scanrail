@@ -1,0 +1,163 @@
+apiVersion: mcp-workbench.dev/v0alpha1
+server:
+  transport: stdio
+  command: node
+  args:
+    - examples/mcp-workbench/serve-fixture.mjs
+tests:
+  - id: tools-list
+    description: Scanrail exposes the expected MCP tools
+    tags: [discovery]
+    act:
+      method: tools/list
+    assert:
+      - kind: status
+        equals: success
+      - kind: contains
+        path: $.tools[*].name
+        value: scanrail_doctor
+      - kind: contains
+        path: $.tools[*].name
+        value: scanrail_config_read
+      - kind: contains
+        path: $.tools[*].name
+        value: scanrail_report_latest
+      - kind: contains
+        path: $.tools[*].name
+        value: scanrail_run
+
+  - id: resources-list
+    description: Scanrail exposes the expected MCP resources
+    tags: [discovery]
+    act:
+      method: resources/list
+    assert:
+      - kind: status
+        equals: success
+      - kind: contains
+        path: $.resources[*].uri
+        value: scanrail://config
+      - kind: contains
+        path: $.resources[*].uri
+        value: scanrail://reports/latest/summary
+      - kind: contains
+        path: $.resources[*].uri
+        value: scanrail://safety-model
+
+  - id: config-resource
+    description: Config resource returns the fixture target and redacted token environment name
+    tags: [resources]
+    act:
+      method: resources/read
+      uri: scanrail://config
+    assert:
+      - kind: status
+        equals: success
+      - kind: jsonpath
+        path: $.contents[0].text
+        contains: '"project_name": "workbench-mcp"'
+      - kind: jsonpath
+        path: $.contents[0].text
+        contains: '"token_env": "SCANRAIL_TOKEN"'
+
+  - id: safety-model-resource
+    description: Safety model documents active scan confirmation
+    tags: [resources, safety]
+    act:
+      method: resources/read
+      uri: scanrail://safety-model
+    assert:
+      - kind: status
+        equals: success
+      - kind: jsonpath
+        path: $.contents[0].text
+        contains: confirm_active_scan=true
+
+  - id: run-denied-without-confirmation
+    description: Active scan is denied when confirm_active_scan is missing
+    tags: [tools, safety]
+    act:
+      method: tools/call
+      tool: scanrail_run
+      args:
+        only: headers
+    assert:
+      - kind: status
+        equals: success
+      - kind: executionError
+        equals: true
+      - kind: jsonpath
+        path: $.content[0].text
+        contains: confirm_active_scan=true
+
+  - id: run-denied-outside-allowlist
+    description: Active scan is denied when the target is outside the configured allowlist
+    tags: [tools, safety]
+    act:
+      method: tools/call
+      tool: scanrail_run
+      args:
+        only: headers
+        target: http://example.com
+        confirm_active_scan: true
+    assert:
+      - kind: status
+        equals: success
+      - kind: executionError
+        equals: true
+      - kind: jsonpath
+        path: $.content[0].text
+        contains: outside the configured Scanrail allowlist
+
+  - id: run-headers-confirmed
+    description: Confirmed native headers scan completes and writes reports
+    tags: [tools, scan]
+    act:
+      method: tools/call
+      tool: scanrail_run
+      args:
+        only: headers
+        confirm_active_scan: true
+    assert:
+      - kind: status
+        equals: success
+      - kind: executionError
+        equals: false
+      - kind: equals
+        path: $.structuredContent.exit_code
+        value: 0
+      - kind: jsonpath
+        path: $.structuredContent.output
+        contains: Scanrail completed
+
+  - id: report-latest-tool
+    description: Latest report tool summarizes the scan result
+    tags: [tools, report]
+    act:
+      method: tools/call
+      tool: scanrail_report_latest
+      args: {}
+    assert:
+      - kind: status
+        equals: success
+      - kind: executionError
+        equals: false
+      - kind: equals
+        path: $.structuredContent.project
+        value: workbench-mcp
+      - kind: equals
+        path: $.structuredContent.findings_count
+        value: 4
+
+  - id: report-latest-resource
+    description: Latest report resource exposes the generated summary
+    tags: [resources, report]
+    act:
+      method: resources/read
+      uri: scanrail://reports/latest/summary
+    assert:
+      - kind: status
+        equals: success
+      - kind: jsonpath
+        path: $.contents[0].text
+        contains: '"findings_count": 4'

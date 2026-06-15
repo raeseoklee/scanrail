@@ -49,6 +49,8 @@ Implemented in `scanrail mcp serve`:
 
 The implementation intentionally avoids a new dependency and follows the MCP stdio transport requirement that stdout contains only JSON-RPC messages.
 
+Compatibility regression coverage is captured in the [MCP Workbench Verification](../examples/mcp-workbench/README.md) fixture. It validates discovery, resources, active-scan safety gates, a confirmed native headers scan, and latest report summary retrieval through a real stdio MCP client harness.
+
 ## Proposed Tools
 
 | Tool | Purpose | Safety notes |
