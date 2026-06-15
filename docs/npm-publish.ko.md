@@ -4,6 +4,8 @@
 
 이 문서는 Scanrail의 public npm publish 절차를 정리합니다.
 
+모든 publish에서 [Release Checklist](release-checklist.ko.md)를 사용합니다. checklist는 외부 npm trusted publisher 상태, publish 전 registry snapshot, publish evidence, publish 후 package state를 기록합니다.
+
 ## Package Set
 
 platform package를 먼저 publish하고, wrapper package를 마지막에 publish합니다.

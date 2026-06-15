@@ -2,7 +2,7 @@
 
 # 릴리스 및 제품 리스크 레지스터
 
-이 문서는 첫 public npm release, trusted publishing 설정, `0.1.2` MCP MVP, MCP Workbench 검증 이후 남은 주요 리스크를 추적합니다.
+이 문서는 첫 public npm release, trusted publishing 설정, `0.1.2` MCP MVP, MCP audit logging, MCP Workbench 검증 이후 남은 주요 리스크를 추적합니다.
 
 최종 검토일: 2026년 6월 15일.
 
@@ -18,33 +18,35 @@
 
 | 영역 | 상태 | 주요 잔여 리스크 |
 | --- | --- | --- |
-| npm distribution | MVP 기준 안정 | trusted publisher 설정과 npm package 상태가 git 밖에 있음 |
+| npm distribution | checklist gate 적용 후 MVP 기준 안정 | trusted publisher 설정과 npm package 상태가 git 밖에 있음 |
 | cross-platform install | smoke workflow로 커버 | public npm smoke는 scheduled/manual이며 모든 commit에서 실행되지는 않음 |
-| MCP MVP | 구현 및 Workbench 검증 완료 | 실제 host compatibility와 MCP security hardening은 미완료 |
+| MCP MVP | 구현, audit log 적용, Workbench 검증 완료 | 실제 production host compatibility는 미완료 |
 | scanner adapter | capability gate 기반 구현 | Docker runner, raw artifact handling, scanner-specific adapter는 아직 production code가 아님 |
 | reporting | native headers용 JSON/HTML 제공 | multi-scanner normalization, SARIF, false-positive workflow는 계획 단계 |
 | OSS operations | public repo 사용 가능 | community triage, support boundary, governance는 아직 가벼움 |
 
 ## 즉시 우선순위
 
-1. broader MCP execution tool을 추가하기 전에 MCP audit log와 production host compatibility를 harden합니다 (`R-005`, `R-008`).
-2. richer report data를 노출하기 전에 새 redaction boundary를 raw artifact와 future SARIF까지 확장합니다 (`R-007`, `R-013`, `R-016`).
-3. Gitleaks, Trivy, Semgrep을 skipped scaffold에서 승격하기 전에 Docker runner capability check를 구현합니다 (`R-009`, `R-010`).
-4. 각 publish 전후 npm package state를 기록하는 release checklist를 추가합니다 (`R-001`, `R-002`).
+1. 모든 npm publish마다 [Release Checklist](release-checklist.ko.md)를 실행합니다 (`R-001`, `R-002`, `R-004`).
+2. broader MCP execution tool을 추가하기 전에 production MCP host 최소 1개를 확인합니다 (`R-005`).
+3. richer report data를 노출하기 전에 redaction boundary를 raw artifact와 future SARIF까지 확장합니다 (`R-007`, `R-013`, `R-016`).
+4. Gitleaks, Trivy, Semgrep을 skipped scaffold에서 승격하기 전에 Docker runner capability check를 구현합니다 (`R-009`, `R-010`).
 5. normalized report를 확장하기 전에 scanner version metadata를 보존합니다 (`R-011`, `R-012`).
+
+남은 모든 리스크의 운영 gate는 [리스크 처리 계획](risk-treatment-plan.ko.md)에 정리합니다.
 
 ## 활성 리스크
 
 | ID | 리스크 | 수준 | 상태 | 완화 | 다음 조치 |
 | --- | --- | --- | --- | --- | --- |
-| R-001 | npm trusted publishing 설정 drift | High | 외부 잔여 리스크 | 설정은 git이 아니라 npm에 있습니다. release 문서에 필요한 workflow filename, repository, owner, allowed action을 기록했습니다. | 각 publish 전 모든 package의 trusted publisher 설정을 `.github/workflows/npm-publish.yml`과 대조합니다. |
-| R-002 | partial publish로 package set 불일치 발생 | High | 운영 잔여 리스크 | platform package를 wrapper보다 먼저 publish하고, publish 전에 version을 확인합니다. 실패한 version은 이후 patch version으로 수정합니다. | publish 전후 package version을 기록하는 release checklist 항목을 추가합니다. |
+| R-001 | npm trusted publishing 설정 drift | High | checklist-gated 외부 리스크 | 설정은 git이 아니라 npm에 있습니다. release 문서와 checklist가 필요한 workflow filename, repository, owner, allowed action, package별 확인 절차를 기록합니다. | 각 publish 전 [Release Checklist](release-checklist.ko.md)의 trusted-publisher 섹션을 실행합니다. |
+| R-002 | partial publish로 package set 불일치 발생 | High | checklist-gated 운영 리스크 | platform package를 wrapper보다 먼저 publish하고, publish 전에 version을 확인하며, release checklist가 publish 전후 package state를 기록합니다. 실패한 version은 이후 patch version으로 수정합니다. | [Release Checklist](release-checklist.ko.md)에 registry snapshot과 post-publish package state를 기록합니다. |
 | R-003 | npm 외 release artifact가 아직 unsigned 또는 부재 | Medium | npm MVP에서 수용 | npm provenance는 적용됐습니다. GitHub release archive, checksum, 추가 package manager channel은 roadmap 작업입니다. | stable `v1.0` release path 선언 전 checksum과 GitHub release asset 생성을 추가합니다. |
 | R-004 | public npm smoke가 모든 commit에서 실행되지 않음 | Medium | 부분 완화 | `.github/workflows/npm-smoke.yml`이 scheduled/manual로 public registry 대상 Ubuntu, macOS, Windows 검증을 수행합니다. | release branch에 lightweight post-publish required smoke gate를 둘지 결정합니다. |
 | R-005 | MCP server compatibility가 client ecosystem 전체 대비 좁음 | Medium | 부분 완화 | `mcp-workbench inspect`와 Workbench regression spec이 stdio protocol behavior를 검증합니다. | MCP tool 확장 전 production MCP host 최소 1개에 대한 smoke note 또는 fixture를 추가합니다. |
 | R-006 | MCP tool이 core policy와 diverge하면 CLI safety를 우회할 수 있음 | High | 설계로 통제 | MCP는 CLI safety model 위의 thin adapter로 유지하고, active scan은 `confirm_active_scan=true`와 allowlist를 요구합니다. | MCP tool implementation이 CLI execution과 같은 config, exit-code, safety validation path를 사용하게 유지합니다. |
 | R-007 | MCP resource가 sensitive config 또는 oversized report data를 노출할 수 있음 | High | 부분 완화 | 현재 config resource는 secret value가 아니라 environment variable name만 노출합니다. full report resource는 아직 defer 상태입니다. | `scanrail://reports/latest/json` 또는 richer resource 추가 전 size limit과 redaction test를 추가합니다. |
-| R-008 | MCP tool call audit이 team environment에 충분하지 않음 | Medium | 부분 완화 | MCP-triggered scan attempt는 이제 redacted target과 exit code를 포함해 denied, started, completed event를 `.scanrail/logs/mcp-audit.jsonl`에 기록합니다. confirmed active scan은 start audit event를 기록하지 못하면 실행하지 않습니다. | `scanrail_setup`과 future scanner execution을 추가하기 전 같은 audit trail을 확장합니다. |
+| R-008 | MCP tool call audit이 team environment에 충분하지 않음 | Medium | 부분 완화 | MCP-triggered scan attempt는 이제 redacted target과 exit code를 포함해 denied, started, completed event를 `.scanrail/logs/mcp-audit.jsonl`에 기록합니다. confirmed active scan은 start audit event를 기록하지 못하면 실행하지 않습니다. | `scanrail_setup`과 future scanner execution에 대한 MCP expansion gate로 audit coverage를 취급합니다. |
 | R-009 | scanner adapter 확장으로 network 또는 credential exposure 증가 | High | 부분 완화 | scanner capability metadata가 code에 추가됐습니다. 준비되지 않은 Docker adapter는 profile 실행에서 skip되고, 사용자가 명시 선택하면 exit code `5`로 실패합니다. native headers scanner는 interactive network capability를 선언하고 redirect를 따르지 않습니다. | Docker-backed adapter를 활성화하기 전 scanner-specific allowlist, raw output, credential boundary를 Docker runner에서 강제합니다. |
 | R-010 | Docker-backed scanner가 host OS별로 다르게 동작할 수 있음 | Medium | spike로만 검증 | scanner adapter spike는 한 Docker 환경에서 command shape과 output을 검증했으며 full OS matrix는 아닙니다. | Linux integration test를 먼저 만들고 macOS/Windows Docker compatibility note 또는 matrix coverage를 추가합니다. |
 | R-011 | scanner image 또는 rule update가 finding을 예고 없이 바꿀 수 있음 | Medium | known gap | spike image는 pinning되어 있습니다. production adapter versioning과 update policy는 아직 없습니다. | default scanner image/template을 pinning하고 모든 report에 version을 기록합니다. |
@@ -65,6 +67,7 @@
 | published package가 모든 target OS에서 실행되는지 불확실 | npm smoke workflow가 Ubuntu, macOS, Windows에서 public `scanrail` package를 설치하고 `version`, `doctor`, signature audit check를 실행합니다. |
 | Windows hosted runner label migration | 2026년 6월 GitHub runner image notice 이후 Windows job은 `windows-2025-vs2026`을 명시합니다. |
 | MCP MVP에 real client-style regression coverage 부족 | `examples/mcp-workbench/scanrail-mcp.yaml`이 MCP discovery, resource, safety gating, confirmed native headers scan execution, latest report retrieval을 검증합니다. |
+| npm release package state가 git에 남지 않음 | [Release Checklist](release-checklist.ko.md)가 trusted publisher 확인, publish 전 package state, publish workflow evidence, publish 후 package state, failure handling을 기록합니다. |
 
 ## 검증 게이트
 
@@ -76,6 +79,8 @@ npm test
 npm run publish:dry-run
 make release-dry-run
 ```
+
+[Release Checklist](release-checklist.ko.md)도 완료합니다.
 
 현재 이미 publish된 version으로는 publish workflow의 `mode=validate`를 사용하고 `mode=dry-run`은 새 version으로 bump한 뒤 사용합니다.
 

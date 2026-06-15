@@ -4,6 +4,8 @@
 
 This runbook covers public npm publishes for Scanrail.
 
+Use the [Release Checklist](release-checklist.md) for every publish. The checklist records external npm trusted publisher state, pre-publish registry snapshots, publish evidence, and post-publish package state.
+
 ## Package Set
 
 Publish platform packages first, then the wrapper package:

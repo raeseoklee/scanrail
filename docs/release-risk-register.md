@@ -2,7 +2,7 @@
 
 # Release and Product Risk Register
 
-This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, and the MCP Workbench verification pass.
+This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, MCP audit logging, and the MCP Workbench verification pass.
 
 Last reviewed: June 15, 2026.
 
@@ -18,33 +18,35 @@ Last reviewed: June 15, 2026.
 
 | Area | Status | Main remaining risk |
 | --- | --- | --- |
-| npm distribution | Stable for MVP | Trusted publisher settings and npm package state live outside git. |
+| npm distribution | Stable for MVP with checklist gate | Trusted publisher settings and npm package state live outside git. |
 | Cross-platform install | Covered by smoke workflow | Public npm smoke is scheduled/manual, not run on every commit. |
-| MCP MVP | Implemented and Workbench-verified | Real host compatibility and MCP security hardening are not complete. |
+| MCP MVP | Implemented, audit-logged, and Workbench-verified | Real production host compatibility is not complete. |
 | Scanner adapters | Capability gate foundation implemented | Docker runner, raw artifact handling, and scanner-specific adapters are not production code yet. |
 | Reporting | JSON/HTML for native headers | Multi-scanner normalization, SARIF, and false-positive workflow are still planned. |
 | OSS operations | Public repo is usable | Community triage, support boundaries, and governance are still lightweight. |
 
 ## Immediate Priorities
 
-1. Harden MCP audit logs and production-host compatibility before adding broader MCP execution tools (`R-005`, `R-008`).
-2. Extend the new redaction boundary to raw artifacts and future SARIF before exposing richer report data (`R-007`, `R-013`, `R-016`).
-3. Implement Docker runner capability checks before promoting Gitleaks, Trivy, or Semgrep from skipped scaffolds (`R-009`, `R-010`).
-4. Add a release checklist that captures npm package state before and after each publish (`R-001`, `R-002`).
+1. Run the [Release Checklist](release-checklist.md) for every npm publish (`R-001`, `R-002`, `R-004`).
+2. Confirm at least one production MCP host before adding broader MCP execution tools (`R-005`).
+3. Extend the redaction boundary to raw artifacts and future SARIF before exposing richer report data (`R-007`, `R-013`, `R-016`).
+4. Implement Docker runner capability checks before promoting Gitleaks, Trivy, or Semgrep from skipped scaffolds (`R-009`, `R-010`).
 5. Preserve scanner version metadata before expanding normalized reports (`R-011`, `R-012`).
+
+The operating gates for all remaining risks are tracked in the [Risk Treatment Plan](risk-treatment-plan.md).
 
 ## Active Risks
 
 | ID | Risk | Level | Status | Mitigation | Next action |
 | --- | --- | --- | --- | --- | --- |
-| R-001 | npm trusted publishing settings drift | High | Residual external risk | Settings live in npm, not git. Release docs record the required workflow filename, repository, owner, and allowed action. | Before each publish, validate all package trusted publisher settings against `.github/workflows/npm-publish.yml`. |
-| R-002 | Partial publish leaves package set inconsistent | High | Residual operational risk | Platform packages publish before wrappers, versions are checked before publish, and failed versions must be fixed with a later patch version. | Add a release checklist item that records package versions before and after publish. |
+| R-001 | npm trusted publishing settings drift | High | Checklist-gated external risk | Settings live in npm, not git. Release docs and the release checklist record the required workflow filename, repository, owner, allowed action, and per-package confirmation step. | Run the trusted-publisher section of the [Release Checklist](release-checklist.md) before each publish. |
+| R-002 | Partial publish leaves package set inconsistent | High | Checklist-gated operational risk | Platform packages publish before wrappers, versions are checked before publish, and the release checklist records pre/post package state. Failed versions must be fixed with a later patch version. | Record the registry snapshot and post-publish package state in the [Release Checklist](release-checklist.md). |
 | R-003 | Release artifacts outside npm are unsigned or absent | Medium | Accepted for npm MVP | npm provenance is in place. GitHub release archives, checksums, and additional package-manager channels remain roadmap work. | Add checksum and GitHub release asset generation before declaring a stable `v1.0` release path. |
 | R-004 | Public npm smoke does not run on every commit | Medium | Partially mitigated | `.github/workflows/npm-smoke.yml` covers Ubuntu, macOS, and Windows against the public registry on schedule or manual dispatch. | Decide whether to add a lightweight post-publish required smoke gate for release branches. |
 | R-005 | MCP server compatibility is narrower than the client ecosystem | Medium | Partially mitigated | `mcp-workbench inspect` and the Workbench regression spec validate stdio protocol behavior. | Add smoke notes or fixtures for at least one production MCP host before expanding MCP tools. |
 | R-006 | MCP tools could bypass CLI safety if they diverge from core policy | High | Controlled by design | MCP stays a thin adapter over the CLI safety model, active scans require `confirm_active_scan=true`, and allowlists are enforced. | Keep MCP tool implementations bound to the same config, exit-code, and safety validation paths as CLI execution. |
 | R-007 | MCP resources can leak sensitive configuration or oversized report data | High | Partially mitigated | Current config resources expose secret environment variable names, not values. Planned full report resources are still deferred. | Add size limits and redaction tests before adding `scanrail://reports/latest/json` or richer resources. |
-| R-008 | MCP tool calls are not yet auditable enough for team environments | Medium | Partially mitigated | MCP-triggered scan attempts now write denied, started, and completed events to `.scanrail/logs/mcp-audit.jsonl` with redacted targets and exit codes. Confirmed active scans refuse to run when the start audit event cannot be written. | Extend the same audit trail to `scanrail_setup` and future scanner execution before adding those MCP tools. |
+| R-008 | MCP tool calls are not yet auditable enough for team environments | Medium | Partially mitigated | MCP-triggered scan attempts now write denied, started, and completed events to `.scanrail/logs/mcp-audit.jsonl` with redacted targets and exit codes. Confirmed active scans refuse to run when the start audit event cannot be written. | Treat audit coverage as an MCP expansion gate for `scanrail_setup` and future scanner execution. |
 | R-009 | Scanner adapters can expand network or credential exposure | High | Partially mitigated | Scanner capability metadata now exists in code. Unready Docker adapters are skipped in profile runs and fail with exit code `5` when explicitly selected. The native headers scanner declares interactive network capabilities and does not follow redirects. | Implement Docker runner enforcement for scanner-specific allowlist, raw output, and credential boundaries before enabling Docker-backed adapters. |
 | R-010 | Docker-backed scanners can behave differently across host OSes | Medium | Spike validated only | The scanner adapter spike proved command shapes and outputs in one Docker environment, not a full OS matrix. | Run adapter integration tests on Linux first, then add macOS/Windows Docker compatibility notes or matrix coverage. |
 | R-011 | Scanner image or rule updates can change findings unexpectedly | Medium | Known gap | Spike images are pinned. Production adapter versioning and update policy are not implemented. | Pin default scanner images/templates and record versions in every report. |
@@ -65,6 +67,7 @@ Last reviewed: June 15, 2026.
 | Published package does not run on every target OS | The npm smoke workflow installs the public `scanrail` package on Ubuntu, macOS, and Windows, then runs `version`, `doctor`, and signature audit checks. |
 | Windows hosted runner label migration | Windows jobs pin `windows-2025-vs2026` explicitly after the June 2026 GitHub runner image notice. |
 | MCP MVP lacks real client-style regression coverage | `examples/mcp-workbench/scanrail-mcp.yaml` now verifies MCP discovery, resources, safety gating, confirmed native headers scan execution, and latest report retrieval. |
+| npm release package state is not captured in git | [Release Checklist](release-checklist.md) records trusted publisher checks, pre-publish package state, publish workflow evidence, post-publish package state, and failure handling. |
 
 ## Verification Gates
 
@@ -76,6 +79,8 @@ npm test
 npm run publish:dry-run
 make release-dry-run
 ```
+
+Also complete the [Release Checklist](release-checklist.md).
 
 For the current already-published version, use `mode=validate` in the publish workflow instead of `mode=dry-run`.
 
