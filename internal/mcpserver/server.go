@@ -19,6 +19,7 @@ import (
 	"github.com/raeseoklee/scanrail/internal/config"
 	"github.com/raeseoklee/scanrail/internal/exitcode"
 	"github.com/raeseoklee/scanrail/internal/report"
+	"github.com/raeseoklee/scanrail/internal/safety"
 	"github.com/raeseoklee/scanrail/internal/version"
 )
 
@@ -215,7 +216,9 @@ func (s server) reportLatest(args json.RawMessage) (any, *rpcError) {
 	if err != nil {
 		return errorToolResult(err.Error()), nil
 	}
-	text := mustJSON(summary)
+	redactor := safety.DefaultRedactor()
+	summary = redactor.RedactValue(summary).(map[string]any)
+	text := redactor.RedactString(mustJSON(summary))
 	return toolResult{
 		Content:           []textContent{{Type: "text", Text: text}},
 		StructuredContent: summary,
@@ -244,6 +247,7 @@ func (s server) runHeaders(ctx context.Context, args json.RawMessage) (any, *rpc
 	if err != nil {
 		return nil, &rpcError{Code: -32603, Message: "Could not read config", Data: err.Error()}
 	}
+	redactor := safety.NewRedactorFromEnv(cfg.TokenEnv)
 	target := opts.Target
 	if target == "" {
 		target = cfg.TargetURL
@@ -259,19 +263,20 @@ func (s server) runHeaders(ctx context.Context, args json.RawMessage) (any, *rpc
 		Only:       "headers",
 		OutputDir:  opts.OutputDir,
 	}, &out)
+	redactedOutput := redactor.RedactString(out.String())
 	result := map[string]any{
 		"exit_code": code,
-		"output":    strings.TrimSpace(out.String()),
+		"output":    strings.TrimSpace(redactedOutput),
 	}
 	if code != exitcode.OK {
 		return toolResult{
-			Content:           []textContent{{Type: "text", Text: out.String()}},
+			Content:           []textContent{{Type: "text", Text: redactedOutput}},
 			IsError:           true,
 			StructuredContent: result,
 		}, nil
 	}
 	return toolResult{
-		Content:           []textContent{{Type: "text", Text: out.String()}},
+		Content:           []textContent{{Type: "text", Text: redactedOutput}},
 		StructuredContent: result,
 	}, nil
 }
@@ -299,7 +304,8 @@ func (s server) readResource(params json.RawMessage) (any, *rpcError) {
 		var summary any
 		summary, err = s.latestReport("", "")
 		if err == nil {
-			text = mustJSON(summary)
+			redactor := safety.DefaultRedactor()
+			text = redactor.RedactString(mustJSON(redactor.RedactValue(summary)))
 		}
 	case "scanrail://safety-model":
 		mime = "text/markdown"
@@ -422,6 +428,13 @@ func (s server) latestReport(configPathArg string, outputDir string) (map[string
 	for _, finding := range rr.Findings {
 		bySeverity[finding.Severity]++
 	}
+	skipped := make([]any, 0, len(rr.Skipped))
+	for _, item := range rr.Skipped {
+		skipped = append(skipped, map[string]any{
+			"tool":   item.Tool,
+			"reason": item.Reason,
+		})
+	}
 	return map[string]any{
 		"path":                 path,
 		"project":              rr.Project,
@@ -430,7 +443,7 @@ func (s server) latestReport(configPathArg string, outputDir string) (map[string
 		"started_at":           rr.StartedAt,
 		"findings_count":       len(rr.Findings),
 		"findings_by_severity": bySeverity,
-		"skipped":              rr.Skipped,
+		"skipped":              skipped,
 	}, nil
 }
 
@@ -488,12 +501,13 @@ func configPath(path string, workdir string) string {
 }
 
 func redactedConfig(cfg config.Config) map[string]any {
+	redactor := safety.NewRedactorFromEnv(cfg.TokenEnv)
 	return map[string]any{
 		"project_name":        cfg.ProjectName,
-		"target_url":          cfg.TargetURL,
-		"allowlist":           cfg.Allowlist,
+		"target_url":          redactor.RedactString(cfg.TargetURL),
+		"allowlist":           redactor.RedactValue(cfg.Allowlist),
 		"auth":                map[string]string{"token_env": cfg.TokenEnv},
-		"output_dir":          cfg.OutputDir,
+		"output_dir":          redactor.RedactString(cfg.OutputDir),
 		"fail_on":             cfg.FailOn,
 		"active_scan_default": cfg.ActiveScanDefault,
 	}

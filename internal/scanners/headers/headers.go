@@ -20,7 +20,12 @@ func Scan(ctx context.Context, target string) ([]report.Finding, error) {
 	}
 	req.Header.Set("User-Agent", "scanrail/0")
 	req.Header.Set("X-Scanrail-Scanner", "headers")
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

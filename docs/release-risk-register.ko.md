@@ -21,17 +21,17 @@
 | npm distribution | MVP 기준 안정 | trusted publisher 설정과 npm package 상태가 git 밖에 있음 |
 | cross-platform install | smoke workflow로 커버 | public npm smoke는 scheduled/manual이며 모든 commit에서 실행되지는 않음 |
 | MCP MVP | 구현 및 Workbench 검증 완료 | 실제 host compatibility와 MCP security hardening은 미완료 |
-| scanner adapter | spike로만 실증 | Docker runner, adapter contract, redaction, safety gate가 production code가 아님 |
+| scanner adapter | capability gate 기반 구현 | Docker runner, raw artifact handling, scanner-specific adapter는 아직 production code가 아님 |
 | reporting | native headers용 JSON/HTML 제공 | multi-scanner normalization, SARIF, false-positive workflow는 계획 단계 |
 | OSS operations | public repo 사용 가능 | community triage, support boundary, governance는 아직 가벼움 |
 
 ## 즉시 우선순위
 
-1. Docker-backed scanner를 default profile에 넣기 전에 adapter safety와 redaction gap을 먼저 닫습니다 (`R-009`, `R-013`).
-2. broader MCP execution tool을 추가하기 전에 MCP resource, audit log, host compatibility를 harden합니다 (`R-005`, `R-007`, `R-008`).
-3. 각 publish 전후 npm package state를 기록하는 release checklist를 추가합니다 (`R-001`, `R-002`).
-4. normalized report를 확장하기 전에 raw scanner evidence와 version metadata를 보존합니다 (`R-011`, `R-012`).
-5. Scanrail을 PR-native security gate로 positioning하기 전에 SARIF를 required milestone로 취급합니다 (`R-016`).
+1. broader MCP execution tool을 추가하기 전에 MCP audit log와 production host compatibility를 harden합니다 (`R-005`, `R-008`).
+2. richer report data를 노출하기 전에 새 redaction boundary를 raw artifact와 future SARIF까지 확장합니다 (`R-007`, `R-013`, `R-016`).
+3. Gitleaks, Trivy, Semgrep을 skipped scaffold에서 승격하기 전에 Docker runner capability check를 구현합니다 (`R-009`, `R-010`).
+4. 각 publish 전후 npm package state를 기록하는 release checklist를 추가합니다 (`R-001`, `R-002`).
+5. normalized report를 확장하기 전에 scanner version metadata를 보존합니다 (`R-011`, `R-012`).
 
 ## 활성 리스크
 
@@ -45,11 +45,11 @@
 | R-006 | MCP tool이 core policy와 diverge하면 CLI safety를 우회할 수 있음 | High | 설계로 통제 | MCP는 CLI safety model 위의 thin adapter로 유지하고, active scan은 `confirm_active_scan=true`와 allowlist를 요구합니다. | MCP tool implementation이 CLI execution과 같은 config, exit-code, safety validation path를 사용하게 유지합니다. |
 | R-007 | MCP resource가 sensitive config 또는 oversized report data를 노출할 수 있음 | High | 부분 완화 | 현재 config resource는 secret value가 아니라 environment variable name만 노출합니다. full report resource는 아직 defer 상태입니다. | `scanrail://reports/latest/json` 또는 richer resource 추가 전 size limit과 redaction test를 추가합니다. |
 | R-008 | MCP tool call audit이 team environment에 충분하지 않음 | Medium | known gap | 설계 문서는 scan/setup tool call 기록을 요구하지만 audit logging은 아직 완성된 product feature가 아닙니다. | `scanrail_setup` 또는 broader scanner execution 추가 전 MCP-triggered scan에 대한 local execution log를 추가합니다. |
-| R-009 | scanner adapter 확장으로 network 또는 credential exposure 증가 | High | 제품 safety 리스크 | active scan은 opt-in, target allowlist는 강제, secret은 environment variable name으로만 참조, adapter capability는 문서화했습니다. | Docker-backed scanner를 default profile에 넣기 전 adapter capability metadata와 fail/skip behavior를 구현합니다. |
+| R-009 | scanner adapter 확장으로 network 또는 credential exposure 증가 | High | 부분 완화 | scanner capability metadata가 code에 추가됐습니다. 준비되지 않은 Docker adapter는 profile 실행에서 skip되고, 사용자가 명시 선택하면 exit code `5`로 실패합니다. native headers scanner는 interactive network capability를 선언하고 redirect를 따르지 않습니다. | Docker-backed adapter를 활성화하기 전 scanner-specific allowlist, raw output, credential boundary를 Docker runner에서 강제합니다. |
 | R-010 | Docker-backed scanner가 host OS별로 다르게 동작할 수 있음 | Medium | spike로만 검증 | scanner adapter spike는 한 Docker 환경에서 command shape과 output을 검증했으며 full OS matrix는 아닙니다. | Linux integration test를 먼저 만들고 macOS/Windows Docker compatibility note 또는 matrix coverage를 추가합니다. |
 | R-011 | scanner image 또는 rule update가 finding을 예고 없이 바꿀 수 있음 | Medium | known gap | spike image는 pinning되어 있습니다. production adapter versioning과 update policy는 아직 없습니다. | default scanner image/template을 pinning하고 모든 report에 version을 기록합니다. |
 | R-012 | normalized report가 scanner-specific context를 숨길 수 있음 | Medium | known gap | spike는 raw output을 보존하고 core field를 normalize합니다. production report schema는 아직 evolving 상태입니다. | raw artifact를 별도 저장하고 normalized finding이 scanner, rule, evidence, remediation field로 되돌아갈 수 있게 합니다. |
-| R-013 | secret redaction이 raw scanner output path를 놓칠 수 있음 | High | known gap | product doc은 redaction을 요구하고, spike는 raw artifact capture를 implementation implication으로 식별했습니다. | log, raw artifact, MCP resource, HTML, JSON, future SARIF를 노출하기 전 central redaction을 적용합니다. |
+| R-013 | secret redaction이 raw scanner output path를 놓칠 수 있음 | High | 부분 완화 | central redaction이 configured env value, auth header, cookie, token/password field, URL userinfo, secret-like query parameter를 report JSON/HTML persistence와 MCP report/run output 전에 masking합니다. | raw scanner artifact와 future SARIF를 ship하기 전에 같은 redaction boundary를 확장합니다. |
 | R-014 | 사용자가 현재 native headers scan의 coverage를 과대평가할 수 있음 | Medium | 문서 리스크 | README와 docs는 MVP가 commercial scanner parity가 아니며 Docker-backed adapter가 planned 상태라고 설명합니다. | README, report, release note에 capability와 non-goal 문구를 계속 노출합니다. |
 | R-015 | team-scale accepted risk management workflow가 아직 없음 | Medium | roadmap item | ignore rule, policy pack, issue export, workflow integration은 이후 milestone에 있습니다. | severity override 또는 team policy feature 전에 expiring ignore rule을 구현합니다. |
 | R-016 | SARIF와 CI artifact integration이 아직 ship되지 않음 | Low | 계획됨 | CI/CD milestone에 SARIF, JUnit XML, CI template이 포함되어 있습니다. | Scanrail을 PR-native security gate로 positioning하기 전 SARIF를 required로 취급합니다. |

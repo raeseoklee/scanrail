@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/raeseoklee/scanrail/internal/safety"
 )
 
 type Finding struct {
@@ -33,6 +35,7 @@ type RunReport struct {
 }
 
 func WriteJSON(path string, report RunReport) error {
+	report = report.Redacted(safety.DefaultRedactor())
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -44,6 +47,7 @@ func WriteJSON(path string, report RunReport) error {
 }
 
 func WriteHTML(path string, report RunReport) error {
+	report = report.Redacted(safety.DefaultRedactor())
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -53,6 +57,26 @@ func WriteHTML(path string, report RunReport) error {
 	}
 	defer f.Close()
 	return htmlTemplate.Execute(f, report)
+}
+
+func (r RunReport) Redacted(redactor safety.Redactor) RunReport {
+	r.Project = redactor.RedactString(r.Project)
+	r.Target = redactor.RedactString(r.Target)
+	r.Profile = redactor.RedactString(r.Profile)
+	for i := range r.Findings {
+		r.Findings[i].ID = redactor.RedactString(r.Findings[i].ID)
+		r.Findings[i].Title = redactor.RedactString(r.Findings[i].Title)
+		r.Findings[i].Severity = redactor.RedactString(r.Findings[i].Severity)
+		r.Findings[i].Confidence = redactor.RedactString(r.Findings[i].Confidence)
+		r.Findings[i].Target = redactor.RedactString(r.Findings[i].Target)
+		r.Findings[i].Description = redactor.RedactString(r.Findings[i].Description)
+		r.Findings[i].Remediation = redactor.RedactString(r.Findings[i].Remediation)
+	}
+	for i := range r.Skipped {
+		r.Skipped[i].Tool = redactor.RedactString(r.Skipped[i].Tool)
+		r.Skipped[i].Reason = redactor.RedactString(r.Skipped[i].Reason)
+	}
+	return r
 }
 
 var htmlTemplate = template.Must(template.New("report").Parse(`<!doctype html>

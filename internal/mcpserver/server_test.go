@@ -97,11 +97,41 @@ func TestAllowedTargetUsesConfigAllowlist(t *testing.T) {
 	}
 }
 
+func TestLatestReportResourceRedactsSecretQuery(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	cfg := config.Defaults(dir)
+	cfg.ProjectName = "demo"
+	cfg.TargetURL = "http://localhost:8080"
+	if err := config.WriteInitial("scanrail.yaml", cfg, false); err != nil {
+		t.Fatal(err)
+	}
+	writeReportWithTarget(t, filepath.Join(dir, ".scanrail", "reports", "demo-20260101.json"), "https://example.com?token=supersecret")
+
+	input := `{"jsonrpc":"2.0","id":1,"method":"resources/read","params":{"uri":"scanrail://reports/latest/summary"}}` + "\n"
+	var out bytes.Buffer
+	if code := Serve(context.Background(), strings.NewReader(input), &out, ioDiscard{}); code != 0 {
+		t.Fatalf("Serve exit code = %d", code)
+	}
+	responses := decodeResponses(t, out.String())
+	reportText := contentText(t, responses[0])
+	if strings.Contains(reportText, "supersecret") {
+		t.Fatalf("latest report resource leaked secret: %s", reportText)
+	}
+	if !strings.Contains(reportText, "[REDACTED]") {
+		t.Fatalf("latest report resource missing redaction marker: %s", reportText)
+	}
+}
+
 func writeReport(t *testing.T, path string) {
+	writeReportWithTarget(t, path, "http://localhost:8080")
+}
+
+func writeReportWithTarget(t *testing.T, path string, target string) {
 	t.Helper()
 	rr := report.RunReport{
 		Project: "demo",
-		Target:  "http://localhost:8080",
+		Target:  target,
 		Profile: "quick",
 		Findings: []report.Finding{{
 			ID:       "headers.missing.content_security_policy",

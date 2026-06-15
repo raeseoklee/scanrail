@@ -36,6 +36,13 @@ If a profile requires a capability the scanner cannot provide, Scanrail must:
 - fail when the user explicitly selected that scanner, or
 - keep the scanner out of default profiles until support is clear.
 
+Current MVP enforcement:
+
+- Scanner capability metadata is declared in `internal/scanners`.
+- Docker-backed scanners remain non-production-ready and are skipped in profile execution.
+- Explicit execution of a non-production-ready scanner fails with safety exit code `5`.
+- The native headers scanner does not follow redirects and declares `allowlist_scope`, `redirect_scope`, `rate_limit`, and `header_injection`.
+
 Network-level enforcement through a dedicated Docker network and egress proxy is a later v0.x design.
 
 ## Target Restrictions
@@ -110,7 +117,7 @@ auth:
   token: raw-secret-value
 ```
 
-All logs, raw command previews, and reports must redact secret values.
+All logs, raw command previews, and reports must redact secret values. The current implementation centralizes masking in `internal/safety` and applies it before report JSON/HTML persistence and MCP report/run outputs. Future raw scanner artifacts and SARIF output must pass through the same boundary before being exposed.
 
 ## Exit Codes
 

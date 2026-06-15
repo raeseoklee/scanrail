@@ -36,6 +36,13 @@ auth_injection
 - 사용자가 명시 실행한 scanner라면 안전 정책 위반으로 실패합니다.
 - 구현 상태가 불명확한 scanner는 기본 profile에 포함하지 않습니다.
 
+현재 MVP 강제 상태:
+
+- scanner capability metadata는 `internal/scanners`에 선언합니다.
+- Docker-backed scanner는 아직 production-ready가 아니므로 profile 실행에서 skip합니다.
+- production-ready가 아닌 scanner를 명시 실행하면 safety exit code `5`로 실패합니다.
+- native headers scanner는 redirect를 따르지 않고 `allowlist_scope`, `redirect_scope`, `rate_limit`, `header_injection`을 선언합니다.
+
 네트워크 레벨 강제 모델은 v0.x 후속 과제입니다. 이 방식은 전용 Docker network와 egress proxy를 두고 allowlist, path, method, RPS를 프록시에서 강제하는 구조입니다.
 
 ## 대상 제한
@@ -218,6 +225,8 @@ auth:
 Authorization: Bearer [REDACTED]
 Cookie: SESSION=[REDACTED]
 ```
+
+현재 구현은 `internal/safety`의 central redactor를 사용하며 report JSON/HTML persistence와 MCP report/run output 전에 masking합니다. 이후 raw scanner artifact와 SARIF output을 노출할 때도 같은 boundary를 반드시 통과해야 합니다.
 
 ## 실패 우선 원칙
 

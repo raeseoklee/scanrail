@@ -14,6 +14,8 @@ import (
 	"github.com/raeseoklee/scanrail/internal/config"
 	"github.com/raeseoklee/scanrail/internal/exitcode"
 	"github.com/raeseoklee/scanrail/internal/report"
+	"github.com/raeseoklee/scanrail/internal/safety"
+	"github.com/raeseoklee/scanrail/internal/scanners"
 	"github.com/raeseoklee/scanrail/internal/scanners/headers"
 	"github.com/raeseoklee/scanrail/internal/version"
 	"github.com/raeseoklee/scanrail/internal/workspace"
@@ -177,36 +179,67 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 		Profile:   opts.Profile,
 		StartedAt: time.Now().UTC(),
 	}
-	tools := []string{"gitleaks", "trivy", "semgrep", "headers"}
+	redactor := safety.NewRedactorFromEnv(cfg.TokenEnv)
+	tools := scanners.DefaultTools()
 	if opts.Only != "" {
 		tools = []string{opts.Only}
 	}
 	for _, tool := range tools {
+		definition, ok := scanners.DefinitionFor(tool)
+		if !ok {
+			fmt.Fprintln(stdout, "Unknown tool:", tool)
+			return exitcode.ConfigError
+		}
+		if !definition.ProductionReady {
+			reason := definition.SkipReason
+			if reason == "" {
+				reason = "scanner adapter is not production-ready"
+			}
+			if opts.Only == tool {
+				fmt.Fprintf(stdout, "%s safety violation: %s\n", tool, redactor.RedactString(reason))
+				return exitcode.SafetyViolation
+			}
+			runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: reason})
+			continue
+		}
+		if definition.Intrusiveness == safety.IntrusivenessInteractive {
+			missing := safety.MissingCapabilities(safety.InteractiveNetworkRequirements(), definition.Capabilities)
+			if len(missing) > 0 {
+				reason := "scanner is missing required safety capabilities: " + safety.JoinMissing(missing)
+				if opts.Only == tool {
+					fmt.Fprintf(stdout, "%s safety violation: %s\n", tool, redactor.RedactString(reason))
+					return exitcode.SafetyViolation
+				}
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: reason})
+				continue
+			}
+		}
 		switch tool {
 		case "headers":
 			findings, err := headers.Scan(ctx, cfg.TargetURL)
 			if err != nil {
 				if opts.Only == "headers" {
-					fmt.Fprintln(stdout, "headers failed:", err)
+					fmt.Fprintln(stdout, "headers failed:", redactor.RedactString(err.Error()))
 					return exitcode.ConfigError
 				}
-				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "headers", Reason: err.Error()})
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "headers", Reason: redactor.RedactString(err.Error())})
 				continue
 			}
 			runReport.Findings = append(runReport.Findings, findings...)
 		case "gitleaks", "trivy", "semgrep":
-			runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: "docker adapter command generation is scaffolded for the first release candidate"})
+			runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: definition.SkipReason})
 		default:
 			fmt.Fprintln(stdout, "Unknown tool:", tool)
 			return exitcode.ConfigError
 		}
 	}
 	base := filepath.Join(ws.ReportsDir, cfg.ProjectName+"-"+ws.RunID)
-	if err := report.WriteJSON(base+".json", runReport); err != nil {
+	persistedReport := runReport.Redacted(redactor)
+	if err := report.WriteJSON(base+".json", persistedReport); err != nil {
 		fmt.Fprintln(stdout, "Report failed:", err)
 		return exitcode.Environment
 	}
-	if err := report.WriteHTML(base+".html", runReport); err != nil {
+	if err := report.WriteHTML(base+".html", persistedReport); err != nil {
 		fmt.Fprintln(stdout, "Report failed:", err)
 		return exitcode.Environment
 	}
