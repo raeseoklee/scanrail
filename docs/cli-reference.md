@@ -18,8 +18,7 @@ scanrail auth setup
 scanrail report open
 ```
 
-The first release candidate implements `doctor`, `init`, `setup`, `run`, and `version`.
-Version `0.1.2` also implements the stdio MCP server through `mcp serve`.
+The current MVP implements `doctor`, `init`, `setup`, `run`, `version`, and the stdio MCP server through `mcp serve`.
 
 ## Common Exit Codes
 
@@ -102,7 +101,7 @@ Options:
 --pull-policy <policy>  missing, always, or never
 ```
 
-The first release candidate supports `--pull-policy never` for offline/dry-run setup. Docker image pulls are skipped for placeholder scanner images until real adapters are implemented.
+`setup` prepares `.scanrail` workspace state and can pull pinned scanner images. Gitleaks uses the pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image. Placeholder Trivy and Semgrep image entries are recorded in `tools.lock.yaml` but skipped until those adapters are implemented.
 
 ## `scanrail run`
 
@@ -111,6 +110,7 @@ Runs a scan profile or a selected scanner.
 ```bash
 scanrail run --profile quick
 scanrail run --only headers
+scanrail run --only gitleaks
 scanrail run --target https://staging.example.com
 ```
 
@@ -128,6 +128,8 @@ Target behavior:
 - If a profile-selected scanner has no required target, it is skipped with evidence.
 - If a scanner was selected with `--only` and its target is missing, the command fails.
 - Safety capability mismatches fail explicit execution and are recorded for profile execution.
+- `gitleaks` requires Docker and scans the local workspace through a read-only bind mount.
+- `headers` is native Go code and does not require Docker.
 
 ## `scanrail version`
 
@@ -168,7 +170,7 @@ Safety behavior:
 
 - stdio only; no local HTTP listener
 - no arbitrary shell execution
-- `scanrail_run` only supports the native `headers` scanner in the MVP
+- `scanrail_run` only supports the native `headers` scanner in the MCP MVP
 - active scan execution requires `confirm_active_scan=true`
 - target host must match the configured target host or `targets.web.allowlist`
 - MCP-triggered scan attempts are recorded in `.scanrail/logs/mcp-audit.jsonl`

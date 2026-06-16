@@ -4,16 +4,16 @@
 
 이 문서는 release risk register를 실제 운영 gate로 바꿉니다. [릴리스 리스크 레지스터](release-risk-register.ko.md)를 대체하지 않고, 남은 리스크를 release 또는 기능 확장 전에 어떻게 다룰지 설명합니다.
 
-최종 검토일: 2026년 6월 15일.
+최종 검토일: 2026년 6월 16일.
 
 ## 현재 결정
 
-release checklist와 verification gate가 통과한다면 현재 native-headers MVP에는 알려진 release blocker가 없습니다.
+release checklist와 verification gate가 통과한다면 현재 headers + Gitleaks MVP에는 알려진 release blocker가 없습니다.
 
 남은 리스크는 기능 확장 gate로 관리합니다.
 
 - production host compatibility와 audit 동작을 검증하기 전 MCP execution surface를 넓히지 않습니다.
-- adapter isolation, redaction, raw artifact handling, version metadata가 구현되기 전 Docker-backed scanner를 활성화하지 않습니다.
+- 각 adapter마다 adapter isolation, redaction, raw artifact handling, version metadata가 구현되기 전 추가 Docker-backed scanner를 활성화하지 않습니다.
 - SARIF와 artifact workflow가 ship되기 전 Scanrail을 PR-native CI security gate로 positioning하지 않습니다.
 - license metadata 없이 third-party scanner rule pack을 bundle하지 않습니다.
 
@@ -40,7 +40,7 @@ release checklist와 verification gate가 통과한다면 현재 native-headers 
 
 ## Scanner Adapter Gate
 
-Gitleaks, Trivy, Semgrep 또는 future Docker-backed adapter를 skipped scaffold에서 실행 상태로 승격하기 전 다음 gate가 필요합니다.
+Trivy, Semgrep 또는 future Docker-backed adapter를 skipped scaffold에서 실행 상태로 승격하기 전 다음 gate가 필요합니다. Gitleaks는 `0.1.4`에서 첫 gate slice를 통과했지만, OS matrix와 digest-level image policy는 아직 열려 있습니다.
 
 | 리스크 | Gate | 활성화 전 필요 조건 |
 | --- | --- | --- |

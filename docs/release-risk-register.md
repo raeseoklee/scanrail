@@ -2,9 +2,9 @@
 
 # Release and Product Risk Register
 
-This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, MCP audit logging, and the MCP Workbench verification pass.
+This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, MCP audit logging, the MCP Workbench verification pass, and the `0.1.4` Gitleaks adapter slice.
 
-Last reviewed: June 15, 2026.
+Last reviewed: June 16, 2026.
 
 ## Risk Levels
 
@@ -21,17 +21,17 @@ Last reviewed: June 15, 2026.
 | npm distribution | Stable for MVP with checklist gate | Trusted publisher settings and npm package state live outside git. |
 | Cross-platform install | Covered by smoke workflow | Public npm smoke is scheduled/manual, not run on every commit. |
 | MCP MVP | Implemented, audit-logged, and Workbench-verified | Real production host compatibility is not complete. |
-| Scanner adapters | Capability gate foundation implemented | Docker runner, raw artifact handling, and scanner-specific adapters are not production code yet. |
-| Reporting | JSON/HTML for native headers | Multi-scanner normalization, SARIF, and false-positive workflow are still planned. |
+| Scanner adapters | First Docker-backed adapter implemented for Gitleaks | Trivy/Semgrep execution, OS matrix coverage, and digest-level image policy are still planned. |
+| Reporting | JSON/HTML for headers and Gitleaks | SARIF and false-positive workflow are still planned. |
 | OSS operations | Public repo is usable | Community triage, support boundaries, and governance are still lightweight. |
 
 ## Immediate Priorities
 
 1. Run the [Release Checklist](release-checklist.md) for every npm publish (`R-001`, `R-002`, `R-004`).
 2. Confirm at least one production MCP host before adding broader MCP execution tools (`R-005`).
-3. Extend the redaction boundary to raw artifacts and future SARIF before exposing richer report data (`R-007`, `R-013`, `R-016`).
-4. Implement Docker runner capability checks before promoting Gitleaks, Trivy, or Semgrep from skipped scaffolds (`R-009`, `R-010`).
-5. Preserve scanner version metadata before expanding normalized reports (`R-011`, `R-012`).
+3. Extend the redaction boundary to future SARIF before exposing richer report data (`R-007`, `R-013`, `R-016`).
+4. Add Docker adapter integration coverage before promoting Trivy or Semgrep from skipped scaffolds (`R-009`, `R-010`).
+5. Preserve scanner version metadata and raw artifact links as normalized reports expand (`R-011`, `R-012`).
 
 The operating gates for all remaining risks are tracked in the [Risk Treatment Plan](risk-treatment-plan.md).
 
@@ -47,12 +47,12 @@ The operating gates for all remaining risks are tracked in the [Risk Treatment P
 | R-006 | MCP tools could bypass CLI safety if they diverge from core policy | High | Controlled by design | MCP stays a thin adapter over the CLI safety model, active scans require `confirm_active_scan=true`, and allowlists are enforced. | Keep MCP tool implementations bound to the same config, exit-code, and safety validation paths as CLI execution. |
 | R-007 | MCP resources can leak sensitive configuration or oversized report data | High | Partially mitigated | Current config resources expose secret environment variable names, not values. Planned full report resources are still deferred. | Add size limits and redaction tests before adding `scanrail://reports/latest/json` or richer resources. |
 | R-008 | MCP tool calls are not yet auditable enough for team environments | Medium | Partially mitigated | MCP-triggered scan attempts now write denied, started, and completed events to `.scanrail/logs/mcp-audit.jsonl` with redacted targets and exit codes. Confirmed active scans refuse to run when the start audit event cannot be written. | Treat audit coverage as an MCP expansion gate for `scanrail_setup` and future scanner execution. |
-| R-009 | Scanner adapters can expand network or credential exposure | High | Partially mitigated | Scanner capability metadata now exists in code. Unready Docker adapters are skipped in profile runs and fail with exit code `5` when explicitly selected. The native headers scanner declares interactive network capabilities and does not follow redirects. | Implement Docker runner enforcement for scanner-specific allowlist, raw output, and credential boundaries before enabling Docker-backed adapters. |
-| R-010 | Docker-backed scanners can behave differently across host OSes | Medium | Spike validated only | The scanner adapter spike proved command shapes and outputs in one Docker environment, not a full OS matrix. | Run adapter integration tests on Linux first, then add macOS/Windows Docker compatibility notes or matrix coverage. |
-| R-011 | Scanner image or rule updates can change findings unexpectedly | Medium | Known gap | Spike images are pinned. Production adapter versioning and update policy are not implemented. | Pin default scanner images/templates and record versions in every report. |
-| R-012 | Normalized reports can hide scanner-specific context | Medium | Known gap | The spike preserves raw outputs and normalizes core fields. Production report schema is still evolving. | Store raw artifacts separately and link normalized findings back to scanner, rule, evidence, and remediation fields. |
-| R-013 | Secret redaction may miss raw scanner output paths | High | Partially mitigated | Central redaction now masks configured env values, auth headers, cookies, token/password fields, URL userinfo, and secret-like query parameters before report JSON/HTML persistence and MCP report/run outputs. | Extend the same redaction boundary to raw scanner artifacts and future SARIF before those outputs ship. |
-| R-014 | Users may overestimate coverage from the current native headers scan | Medium | Documentation risk | README and docs state that the MVP is not commercial scanner parity and Docker-backed adapters are planned. | Keep capability and non-goal language visible in README, reports, and release notes. |
+| R-009 | Scanner adapters can expand network or credential exposure | High | Partially mitigated | Gitleaks is enabled as a passive local scanner with a read-only workspace mount and writable raw output mount. Unready Docker adapters are skipped in profile runs and fail with exit code `5` when explicitly selected. The native headers scanner declares interactive network capabilities and does not follow redirects. | Add adapter-specific integration coverage before enabling Trivy, Semgrep, or networked Docker scanners. |
+| R-010 | Docker-backed scanners can behave differently across host OSes | Medium | Partially mitigated | The scanner adapter spike and Gitleaks unit coverage validate command shape, but full Docker behavior is not yet covered across Linux, macOS, and Windows. | Add macOS/Windows Docker compatibility notes or CI matrix coverage for Gitleaks and future adapters. |
+| R-011 | Scanner image or rule updates can change findings unexpectedly | Medium | Partially mitigated | Gitleaks uses a pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image and records tool version/image metadata in reports. Digest-level pinning and broader update policy are not implemented. | Add digest policy or lockfile validation before treating scanner versions as stable release inputs. |
+| R-012 | Normalized reports can hide scanner-specific context | Medium | Partially mitigated | Gitleaks preserves a redacted raw artifact and normalized findings include tool and evidence fields. Broader schema mapping is still evolving. | Add SARIF and false-positive workflow without dropping raw scanner context. |
+| R-013 | Secret redaction may miss raw scanner output paths | High | Partially mitigated | Central redaction now masks configured env values, auth headers, cookies, token/password fields, URL userinfo, and secret-like query parameters before report JSON/HTML persistence and MCP report/run outputs. Gitleaks raw artifacts are rewritten with secret and match fields redacted. | Extend the same redaction boundary to future SARIF and any new raw scanner formats before those outputs ship. |
+| R-014 | Users may overestimate coverage from the current headers plus Gitleaks scan | Medium | Documentation risk | README and docs state that the MVP is not commercial scanner parity and that Trivy, Semgrep, SARIF, and broader DAST remain planned. | Keep capability and non-goal language visible in README, reports, and release notes. |
 | R-015 | Findings workflow is not ready for team-scale accepted risk management | Medium | Roadmap item | Ignore rules, policy packs, issue export, and workflow integrations are listed for later milestones. | Implement expiring ignore rules before adding severity override or team policy features. |
 | R-016 | SARIF and CI artifact integrations are not shipped yet | Low | Planned | CI/CD milestone includes SARIF, JUnit XML, and CI templates. | Treat SARIF as required before positioning Scanrail as a PR-native security gate. |
 | R-017 | OSS support and governance can lag adoption | Medium | Lightweight process | Contributing, security policy, issue templates, and roadmap exist. | Add maintainer response expectations and label workflow once external issues start arriving. |

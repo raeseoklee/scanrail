@@ -6,7 +6,7 @@
 
 목표:
 
-- 개발자가 Docker만으로 기본 보안 점검을 실행할 수 있게 한다.
+- 개발자가 로컬 CLI와 안전한 기본값으로 기본 보안 점검을 실행할 수 있게 한다.
 
 기능:
 
@@ -14,23 +14,24 @@
 - `scanrail init`
 - `scanrail setup`
 - `scanrail run`
-- `scanrail update`
 - `scanrail.yaml` 생성
-- `tools.lock.yaml` 생성
-- HTML/JSON/SARIF 리포트
+- local report directory
+- HTML/JSON 리포트
+- npm wrapper package topology
+- platform binary package
 
 도구:
 
 - Gitleaks
-- Trivy
-- Semgrep
 - basic security headers checker
+- Trivy와 Semgrep adapter surface는 planned 상태
 
 완료 기준:
 
-- 신규 프로젝트에서 10분 안에 첫 리포트 생성
-- high 이상 finding 기준으로 exit code 제어
-- secret 원문이 리포트에 노출되지 않음
+- 신규 프로젝트에서 빠르게 첫 리포트 생성
+- policy, config, runtime, scanner, safety 실패를 exit code로 구분
+- secret 원문이 리포트와 raw artifact에 노출되지 않음
+- npm wrapper가 macOS, Windows, Linux에서 동작
 
 ## v0.2: API 및 웹 스캔 강화
 

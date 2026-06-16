@@ -2,6 +2,14 @@
 
 # 변경 기록
 
+## 0.1.4 - 2026-06-16
+
+- Gitleaks secret detection을 위한 첫 production-ready Docker 기반 scanner adapter를 추가합니다.
+- 공통 Docker runner abstraction을 추가하고 Gitleaks finding을 JSON/HTML report 모델로 정규화합니다.
+- report에 scanner metadata를 보존하고, `.scanrail/raw`에 쓰기 전에 Gitleaks raw artifact를 redaction합니다.
+- 생성되는 quick profile을 `gitleaks`와 `headers` 중심으로 갱신하고, Trivy와 Semgrep은 safety-gated 상태로 유지합니다.
+- 확장된 scanner surface에 맞게 release, safety, setup, roadmap, risk 문서를 갱신합니다.
+
 ## 0.1.3 - 2026-06-15
 
 - MCP Workbench 회귀 검증 근거를 추가하고, MCP 및 scanner demo tape를 공개 문서에 연결합니다.

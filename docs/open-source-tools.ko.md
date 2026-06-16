@@ -9,8 +9,8 @@
 | 영역 | 도구 | 용도 | 도입 단계 |
 | --- | --- | --- | --- |
 | Headers | native Go checker | 보안 헤더 점검 | v0.1 |
-| SAST | Semgrep | 코드 취약점 및 보안 패턴 점검 | v0.1 |
-| 의존성/컨테이너/IaC | Trivy | CVE, 컨테이너, IaC, SBOM 점검 | v0.1 |
+| SAST | Semgrep | 코드 취약점 및 보안 패턴 점검 | v0.x |
+| 의존성/컨테이너/IaC | Trivy | CVE, 컨테이너, IaC, SBOM 점검 | v0.x |
 | Secrets | Gitleaks | 하드코딩된 토큰/키 탐지 | v0.1 |
 | DAST | OWASP ZAP | 웹 런타임 취약점 점검 | v0.2 |
 | 템플릿 기반 스캔 | Nuclei | CVE/설정/노출 패턴 점검 | v0.2 |
@@ -30,6 +30,8 @@
 | SBOM 관리 | Dependency-Track | SBOM 기반 공급망 위험 추적 | 조직 단위 운영에 적합 |
 
 ## 도구별 역할
+
+현재 MVP에서 실제 실행되는 scanner는 native headers checker와 Docker 기반 Gitleaks adapter입니다. Trivy와 Semgrep은 adapter surface와 safety gate를 먼저 유지하고, 실행 adapter는 이후 버전에서 추가합니다.
 
 ### OWASP ZAP
 
@@ -98,8 +100,10 @@
 초기 정책:
 
 - 기본적으로 working tree 중심
-- history scan은 옵션으로 제공
-- false positive allowlist를 프로젝트 설정에 저장
+- workspace를 read-only로 mount
+- Docker image는 `ghcr.io/gitleaks/gitleaks:v8.30.1`로 pinning
+- secret value와 match evidence는 report와 raw artifact 저장 전에 redaction
+- history scan과 false positive allowlist는 이후 옵션으로 확장
 
 ### testssl.sh
 
@@ -141,7 +145,7 @@ tools:
   trivy:
     image: aquasec/trivy:<approved-version>
   gitleaks:
-    image: zricethezav/gitleaks:<approved-version>
+    image: ghcr.io/gitleaks/gitleaks:v8.30.1
   testssl:
     image: drwetter/testssl.sh:<approved-version>
   schemathesis:

@@ -23,7 +23,8 @@ Features:
 Tools:
 
 - native security headers checker
-- planned adapter surfaces for Gitleaks, Trivy, and Semgrep
+- Docker-backed Gitleaks secrets adapter
+- planned adapter surfaces for Trivy and Semgrep
 
 Completion criteria:
 

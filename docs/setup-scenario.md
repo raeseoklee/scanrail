@@ -32,7 +32,7 @@ Disk space          OK
 Ready.
 ```
 
-The first release candidate can also run without Docker-backed scanners when using the native headers scanner.
+Scanrail can also run without Docker when using the native headers scanner only.
 
 ## 3. Initialize Configuration
 
@@ -110,6 +110,7 @@ profiles:
   default: quick
   quick:
     tools:
+      - gitleaks
       - headers
 
 report:
@@ -125,7 +126,7 @@ report:
 scanrail setup
 ```
 
-Offline or first-release dry-run setup:
+Offline or dry-run setup:
 
 ```bash
 scanrail setup --pull-policy never
@@ -137,10 +138,16 @@ scanrail setup --pull-policy never
 scanrail run --profile quick
 ```
 
-For the current MVP scanner:
+For a Docker-free native headers check:
 
 ```bash
 scanrail run --only headers
+```
+
+For the Docker-backed secrets scanner only:
+
+```bash
+scanrail run --only gitleaks
 ```
 
 ## 7. Review Reports

@@ -40,8 +40,6 @@ profiles:
   quick:
     tools:
       - gitleaks
-      - trivy
-      - semgrep
       - headers
 
 safety:
@@ -165,8 +163,6 @@ profiles:
   quick:
     tools:
       - gitleaks
-      - trivy
-      - semgrep
       - headers
 ```
 
@@ -190,7 +186,7 @@ profiles:
 - 사용자가 `--only <tool>`로 명시 실행한 도구가 target을 찾지 못하면 설정 오류로 실패합니다.
 - `strict_targets: true`를 도입하면 profile 실행에서도 skip 대신 실패하도록 확장할 수 있습니다.
 
-v0.1에서 생성되는 기본 프로파일은 실제 구현된 adapter만 포함해야 합니다. Nuclei, ZAP API, Schemathesis, testssl.sh 같은 도구는 v0.2 이후 프로파일 예시로 문서화하되, v0.1 `scanrail init`의 기본 출력에는 포함하지 않습니다.
+현재 생성되는 기본 프로파일은 실제 구현된 adapter만 포함합니다. 즉 Docker 기반 `gitleaks`와 native `headers`입니다. Trivy, Semgrep, Nuclei, ZAP API, Schemathesis, testssl.sh 같은 도구는 구현된 버전의 확장 profile 예시로 문서화하되, 현재 `scanrail init`의 기본 출력에는 포함하지 않습니다.
 
 확장 profile 예시:
 

@@ -39,7 +39,8 @@ If a profile requires a capability the scanner cannot provide, Scanrail must:
 Current MVP enforcement:
 
 - Scanner capability metadata is declared in `internal/scanners`.
-- Docker-backed scanners remain non-production-ready and are skipped in profile execution.
+- Gitleaks is the first production-ready Docker-backed passive scanner and mounts the workspace read-only.
+- Trivy and Semgrep remain non-production-ready and are skipped in profile execution.
 - Explicit execution of a non-production-ready scanner fails with safety exit code `5`.
 - The native headers scanner does not follow redirects and declares `allowlist_scope`, `redirect_scope`, `rate_limit`, and `header_injection`.
 
@@ -117,7 +118,7 @@ auth:
   token: raw-secret-value
 ```
 
-All logs, raw command previews, and reports must redact secret values. The current implementation centralizes masking in `internal/safety` and applies it before report JSON/HTML persistence, MCP report/run outputs, and MCP audit events. Future raw scanner artifacts and SARIF output must pass through the same boundary before being exposed.
+All logs, raw command previews, and reports must redact secret values. The current implementation centralizes masking in `internal/safety` and applies it before report JSON/HTML persistence, MCP report/run outputs, and MCP audit events. Gitleaks raw artifacts are also rewritten with secret and match fields redacted before being exposed. Future SARIF output must pass through the same boundary before being exposed.
 
 MCP-triggered scan attempts are written to `.scanrail/logs/mcp-audit.jsonl` as JSON Lines. Denied, started, and completed events include the tool, decision, redacted target, target host, profile, and exit code when available.
 

@@ -6,7 +6,7 @@ This experiment proves the next Scanrail implementation step before adding produ
 
 ## Why This Exists
 
-The product direction is multi-scanner orchestration, but the current CLI only executes the native headers scanner. Before implementing Gitleaks, Trivy, and Semgrep adapters in the core, this spike validates the real command behavior, output shape, exit codes, path mounts, and redaction needs.
+The product direction is multi-scanner orchestration. This spike was recorded before the first Gitleaks production adapter and validates the real command behavior, output shape, exit codes, path mounts, and redaction needs for Gitleaks, Trivy, and Semgrep.
 
 ## Tools
 

@@ -4,16 +4,16 @@
 
 This document turns the release risk register into operating gates. It does not replace the [Release Risk Register](release-risk-register.md); it explains how the remaining risks are handled before releases or feature expansion.
 
-Last reviewed: June 15, 2026.
+Last reviewed: June 16, 2026.
 
 ## Current Decision
 
-There is no known remaining release blocker for the current native-headers MVP when the release checklist and verification gates pass.
+There is no known remaining release blocker for the current headers plus Gitleaks MVP when the release checklist and verification gates pass.
 
 The remaining risks are expansion gates:
 
 - Do not broaden MCP execution until production-host compatibility and audit behavior are verified.
-- Do not enable Docker-backed scanners until adapter isolation, redaction, raw artifact handling, and version metadata are implemented.
+- Do not enable additional Docker-backed scanners until adapter isolation, redaction, raw artifact handling, and version metadata are implemented for each adapter.
 - Do not position Scanrail as a PR-native CI security gate until SARIF and artifact workflows are shipped.
 - Do not bundle third-party scanner rule packs without license metadata.
 
@@ -40,7 +40,7 @@ These gates must pass before adding `scanrail_setup`, broader scanner execution,
 
 ## Scanner Adapter Gates
 
-These gates must pass before Gitleaks, Trivy, Semgrep, or future Docker-backed adapters move from skipped scaffold to execution.
+These gates must pass before Trivy, Semgrep, or future Docker-backed adapters move from skipped scaffold to execution. Gitleaks passed the first slice of these gates in `0.1.4`; broader OS matrix coverage and digest-level image policy remain open.
 
 | Risk | Gate | Required before enabling |
 | --- | --- | --- |

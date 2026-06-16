@@ -25,10 +25,10 @@ npx scanrail doctor
 
 ```bash
 scanrail init --non-interactive --project-name demo --target https://example.com
-scanrail run --only headers
+scanrail run --profile quick
 ```
 
-The first release includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, and a native security headers scanner. Docker-backed adapters for Gitleaks, Trivy, and Semgrep are planned next.
+The current MVP includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, a native security headers scanner, and a Docker-backed Gitleaks secrets adapter. Use `scanrail run --only headers` without Docker, or `scanrail run --only gitleaks` for the secrets scan only. Trivy and Semgrep adapters are planned.
 
 ## MCP
 

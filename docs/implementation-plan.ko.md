@@ -114,4 +114,4 @@ Makefile
 
 ## 현재 상태
 
-첫 공개 후보는 Go CLI, native headers scanner, JSON/HTML report, npm wrapper, platform package, release dry-run을 포함합니다. Docker-backed scanner adapter는 다음 단계 구현 대상입니다.
+현재 MVP는 Go CLI, native headers scanner, Docker 기반 Gitleaks adapter, JSON/HTML report, npm wrapper, platform package, release dry-run을 포함합니다. Trivy와 Semgrep 같은 추가 Docker-backed scanner adapter는 다음 단계 구현 대상입니다.

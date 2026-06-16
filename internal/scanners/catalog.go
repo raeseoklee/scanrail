@@ -11,7 +11,7 @@ type Definition struct {
 }
 
 func DefaultTools() []string {
-	return []string{"gitleaks", "trivy", "semgrep", "headers"}
+	return []string{"gitleaks", "headers"}
 }
 
 func DefinitionFor(name string) (Definition, bool) {
@@ -34,8 +34,7 @@ var definitions = map[string]Definition{
 	"gitleaks": {
 		Name:            "gitleaks",
 		Intrusiveness:   safety.IntrusivenessPassive,
-		ProductionReady: false,
-		SkipReason:      "docker adapter is not production-ready; command generation and central redaction are required before execution",
+		ProductionReady: true,
 	},
 	"trivy": {
 		Name:            "trivy",

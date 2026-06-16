@@ -71,19 +71,18 @@
 - 기본 프로파일
 - CI 실패 기준
 
-### 2. Docker 기반 도구 구성
+### 2. 도구 구성
 
-`scanrail setup`은 필요한 도구 이미지를 자동으로 준비합니다.
+`scanrail setup`은 workspace와 필요한 도구 이미지를 준비합니다.
 
 준비 항목:
 
 - Docker 실행 상태 확인
-- 전용 Docker network 생성
 - 결과/캐시 디렉터리 생성
-- 스캐너 이미지 pull
-- Nuclei templates 업데이트
-- Trivy DB 업데이트
+- pinned scanner image pull 또는 검증
 - `tools.lock.yaml` 생성
+
+현재 MVP는 native security headers scanner와 Docker 기반 Gitleaks secrets adapter를 구현합니다. Docker 기반 Trivy와 Semgrep adapter는 planned v0.x surface로 남아 있습니다.
 
 ### 3. 스캔 프로파일
 
@@ -120,7 +119,7 @@ full     active scan 포함, 명시 승인 필요
 
 - HTML: 개발자 읽기용
 - JSON: 외부/내부 시스템 연동용
-- SARIF: GitHub/GitLab code scanning 연동용
+- SARIF: GitHub/GitLab code scanning 연동용, 이후 릴리스에서 안정화
 
 ## 성공 기준
 

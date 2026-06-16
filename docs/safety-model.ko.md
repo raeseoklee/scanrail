@@ -39,7 +39,8 @@ auth_injection
 현재 MVP 강제 상태:
 
 - scanner capability metadata는 `internal/scanners`에 선언합니다.
-- Docker-backed scanner는 아직 production-ready가 아니므로 profile 실행에서 skip합니다.
+- Gitleaks는 첫 production-ready Docker 기반 passive scanner이며 workspace를 read-only로 mount합니다.
+- Trivy와 Semgrep은 아직 production-ready가 아니므로 profile 실행에서 skip합니다.
 - production-ready가 아닌 scanner를 명시 실행하면 safety exit code `5`로 실패합니다.
 - native headers scanner는 redirect를 따르지 않고 `allowlist_scope`, `redirect_scope`, `rate_limit`, `header_injection`을 선언합니다.
 
@@ -226,7 +227,7 @@ Authorization: Bearer [REDACTED]
 Cookie: SESSION=[REDACTED]
 ```
 
-현재 구현은 `internal/safety`의 central redactor를 사용하며 report JSON/HTML persistence, MCP report/run output, MCP audit event 전에 masking합니다. 이후 raw scanner artifact와 SARIF output을 노출할 때도 같은 boundary를 반드시 통과해야 합니다.
+현재 구현은 `internal/safety`의 central redactor를 사용하며 report JSON/HTML persistence, MCP report/run output, MCP audit event 전에 masking합니다. Gitleaks raw artifact는 저장 전 secret과 match field를 redaction한 형태로 다시 씁니다. 이후 SARIF output을 노출할 때도 같은 boundary를 반드시 통과해야 합니다.
 
 MCP-triggered scan attempt는 JSON Lines 형식으로 `.scanrail/logs/mcp-audit.jsonl`에 기록됩니다. denied, started, completed event에는 tool, decision, redacted target, target host, profile, 가능한 경우 exit code가 포함됩니다.
 

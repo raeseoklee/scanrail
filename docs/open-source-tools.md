@@ -11,14 +11,14 @@ Scanrail combines specialized open-source scanners and presents their results th
 | Headers | native Go checker | security header checks | v0.1 |
 | SAST | Semgrep | code vulnerability and pattern checks | v0.x |
 | Dependencies, containers, IaC | Trivy | CVE, container, IaC, SBOM checks | v0.x |
-| Secrets | Gitleaks | hardcoded token/key detection | v0.x |
+| Secrets | Gitleaks | hardcoded token/key detection | v0.1 |
 | DAST | OWASP ZAP | runtime web vulnerability checks | v0.2 |
 | Template scanning | Nuclei | CVE, misconfiguration, exposure checks | v0.2 |
 | TLS | testssl.sh | TLS and certificate checks | v0.2 |
 | API testing | Schemathesis | OpenAPI-based property and fuzz testing | v0.2 |
 | Result integration | SARIF | code scanning integration | v0.1 partial |
 
-The first release candidate only executes the native headers scanner. Other scanner names are part of the planned adapter surface.
+The current MVP executes the native headers scanner and the Docker-backed Gitleaks adapter. Other scanner names remain part of the planned adapter surface.
 
 ## Additional Candidates
 
@@ -102,6 +102,8 @@ Initial policy:
 
 - never print raw secret values in reports
 - redact evidence
+- mount the workspace read-only
+- pin the Docker image to `ghcr.io/gitleaks/gitleaks:v8.30.1`
 - support allowlisted false positives with expiration dates
 
 ### Native Headers Checker

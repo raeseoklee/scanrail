@@ -90,7 +90,7 @@ scanrail init
 
 ## scanrail setup
 
-Docker 기반 스캐너 실행 환경을 준비합니다.
+`.scanrail` workspace와 Docker 기반 스캐너 실행 환경을 준비합니다.
 
 ```bash
 scanrail setup
@@ -107,12 +107,12 @@ scanrail setup
 
 작업:
 
-- Docker network 생성
 - `.scanrail/cache` 생성
 - `.scanrail/reports` 생성
-- scanner image pull
-- scanner DB/rule/template 업데이트
+- pinned scanner image pull
 - `tools.lock.yaml` 생성 또는 갱신
+
+Gitleaks는 `ghcr.io/gitleaks/gitleaks:v8.30.1` 이미지를 사용합니다. Trivy와 Semgrep은 adapter가 구현될 때까지 `tools.lock.yaml`에 placeholder로 남기고 pull은 skip합니다.
 
 ## scanrail run
 
@@ -121,6 +121,8 @@ scanrail setup
 ```bash
 scanrail run
 scanrail run --profile quick
+scanrail run --only headers
+scanrail run --only gitleaks
 ```
 
 확장 profile을 설정한 경우:
@@ -157,6 +159,13 @@ exit code:
 5  안전 정책 위반으로 실행 거부
 ```
 
+실행 동작:
+
+- `gitleaks`는 Docker가 필요하며 local workspace를 read-only bind mount로 스캔합니다.
+- `headers`는 native Go scanner라 Docker가 없어도 실행할 수 있습니다.
+- profile에 포함된 scanner가 실행 조건을 만족하지 못하면 skip reason을 report에 남깁니다.
+- `--only`로 명시한 scanner가 실행 조건을 만족하지 못하면 실패합니다.
+
 ## scanrail mcp serve
 
 local stdio MCP server를 시작합니다.
@@ -185,7 +194,7 @@ scanrail mcp serve
 
 - stdio only, local HTTP listener 없음
 - arbitrary shell execution 없음
-- MVP의 `scanrail_run`은 native `headers` scanner만 지원
+- MCP MVP의 `scanrail_run`은 native `headers` scanner만 지원
 - active scan 실행은 `confirm_active_scan=true` 필요
 - target host는 configured target host 또는 `targets.web.allowlist`와 일치해야 함
 - MCP-triggered scan attempt는 `.scanrail/logs/mcp-audit.jsonl`에 기록됨

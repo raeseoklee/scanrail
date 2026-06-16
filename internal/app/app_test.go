@@ -78,7 +78,7 @@ func TestExplicitUnreadyAdapterFailsSafety(t *testing.T) {
 	}
 
 	var out bytes.Buffer
-	code := Run(context.Background(), RunOptions{Only: "gitleaks"}, &out)
+	code := Run(context.Background(), RunOptions{Only: "semgrep"}, &out)
 	if code != exitcode.SafetyViolation {
 		t.Fatalf("Run exit code = %d, want SafetyViolation; output: %s", code, out.String())
 	}

@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 0.1.4 - 2026-06-16
+
+- Add the first production-ready Docker-backed scanner adapter for Gitleaks secrets detection.
+- Add a shared Docker runner abstraction and normalize Gitleaks findings into the JSON/HTML report model.
+- Preserve scanner metadata in reports and redact Gitleaks raw artifacts before writing them to `.scanrail/raw`.
+- Update generated quick profiles to run `gitleaks` and `headers`, while keeping Trivy and Semgrep safety-gated.
+- Refresh release, safety, setup, roadmap, and risk docs for the expanded scanner surface.
+
 ## 0.1.3 - 2026-06-15
 
 - Add MCP Workbench regression evidence and connect the MCP and scanner demo tapes in the public docs.

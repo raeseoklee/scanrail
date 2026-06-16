@@ -12,10 +12,12 @@ import (
 	"time"
 
 	"github.com/raeseoklee/scanrail/internal/config"
+	"github.com/raeseoklee/scanrail/internal/dockerx"
 	"github.com/raeseoklee/scanrail/internal/exitcode"
 	"github.com/raeseoklee/scanrail/internal/report"
 	"github.com/raeseoklee/scanrail/internal/safety"
 	"github.com/raeseoklee/scanrail/internal/scanners"
+	"github.com/raeseoklee/scanrail/internal/scanners/gitleaks"
 	"github.com/raeseoklee/scanrail/internal/scanners/headers"
 	"github.com/raeseoklee/scanrail/internal/version"
 	"github.com/raeseoklee/scanrail/internal/workspace"
@@ -113,7 +115,7 @@ func Setup(opts SetupOptions, stdout io.Writer) int {
 	fmt.Fprintln(stdout, "Cache directory      created", rel(ws.CacheDir, ws.Root))
 
 	images := map[string]string{
-		"gitleaks": "zricethezav/gitleaks:<approved-version>",
+		"gitleaks": gitleaks.Image,
 		"trivy":    "aquasec/trivy:<approved-version>",
 		"semgrep":  "semgrep/semgrep:<approved-version>",
 	}
@@ -226,7 +228,26 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 				continue
 			}
 			runReport.Findings = append(runReport.Findings, findings...)
-		case "gitleaks", "trivy", "semgrep":
+		case "gitleaks":
+			result, err := gitleaks.Scan(ctx, gitleaks.Options{
+				WorkspaceDir: ws.Root,
+				RawDir:       ws.RawDir,
+				Redactor:     redactor,
+			})
+			if err != nil {
+				if opts.Only == "gitleaks" {
+					fmt.Fprintln(stdout, "gitleaks failed:", redactor.RedactString(err.Error()))
+					if dockerx.IsDockerUnavailable(err) {
+						return exitcode.Environment
+					}
+					return exitcode.ScannerFailed
+				}
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "gitleaks", Reason: redactor.RedactString(err.Error())})
+				continue
+			}
+			runReport.Findings = append(runReport.Findings, result.Findings...)
+			runReport.Tools = append(runReport.Tools, result.Metadata)
+		case "trivy", "semgrep":
 			runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: definition.SkipReason})
 		default:
 			fmt.Fprintln(stdout, "Unknown tool:", tool)

@@ -6,7 +6,7 @@
 
 ## 목적
 
-제품 방향은 multi-scanner orchestration이지만 현재 CLI에서 실제 실행되는 scanner는 native headers scanner 하나입니다. Gitleaks, Trivy, Semgrep adapter를 core에 붙이기 전에 실제 command 동작, output shape, exit code, path mount, redaction 필요 지점을 확인합니다.
+제품 방향은 multi-scanner orchestration입니다. 이 spike는 첫 Gitleaks production adapter 이전에 녹화한 것으로, Gitleaks, Trivy, Semgrep의 실제 command 동작, output shape, exit code, path mount, redaction 필요 지점을 확인합니다.
 
 ## 도구
 

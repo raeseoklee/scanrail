@@ -1,6 +1,6 @@
 {
   "name": "@scanrail/cli-linux-arm64",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Scanrail binary for Linux arm64",
   "license": "Apache-2.0",
   "repository": {

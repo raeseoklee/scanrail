@@ -12,12 +12,14 @@ import (
 
 type Finding struct {
 	ID          string `json:"id"`
+	Tool        string `json:"tool,omitempty"`
 	Title       string `json:"title"`
 	Severity    string `json:"severity"`
 	Confidence  string `json:"confidence"`
 	Target      string `json:"target"`
 	Description string `json:"description"`
 	Remediation string `json:"remediation"`
+	Evidence    string `json:"evidence,omitempty"`
 }
 
 type Skipped struct {
@@ -25,13 +27,21 @@ type Skipped struct {
 	Reason string `json:"reason"`
 }
 
+type ToolMetadata struct {
+	Tool    string `json:"tool"`
+	Version string `json:"version,omitempty"`
+	Image   string `json:"image,omitempty"`
+	RawPath string `json:"raw_path,omitempty"`
+}
+
 type RunReport struct {
-	Project   string    `json:"project"`
-	Target    string    `json:"target,omitempty"`
-	Profile   string    `json:"profile"`
-	StartedAt time.Time `json:"started_at"`
-	Findings  []Finding `json:"findings"`
-	Skipped   []Skipped `json:"skipped,omitempty"`
+	Project   string         `json:"project"`
+	Target    string         `json:"target,omitempty"`
+	Profile   string         `json:"profile"`
+	StartedAt time.Time      `json:"started_at"`
+	Findings  []Finding      `json:"findings"`
+	Skipped   []Skipped      `json:"skipped,omitempty"`
+	Tools     []ToolMetadata `json:"tools,omitempty"`
 }
 
 func WriteJSON(path string, report RunReport) error {
@@ -60,6 +70,9 @@ func WriteHTML(path string, report RunReport) error {
 }
 
 func (r RunReport) Redacted(redactor safety.Redactor) RunReport {
+	if r.Findings == nil {
+		r.Findings = []Finding{}
+	}
 	r.Project = redactor.RedactString(r.Project)
 	r.Target = redactor.RedactString(r.Target)
 	r.Profile = redactor.RedactString(r.Profile)
@@ -71,10 +84,17 @@ func (r RunReport) Redacted(redactor safety.Redactor) RunReport {
 		r.Findings[i].Target = redactor.RedactString(r.Findings[i].Target)
 		r.Findings[i].Description = redactor.RedactString(r.Findings[i].Description)
 		r.Findings[i].Remediation = redactor.RedactString(r.Findings[i].Remediation)
+		r.Findings[i].Evidence = redactor.RedactString(r.Findings[i].Evidence)
 	}
 	for i := range r.Skipped {
 		r.Skipped[i].Tool = redactor.RedactString(r.Skipped[i].Tool)
 		r.Skipped[i].Reason = redactor.RedactString(r.Skipped[i].Reason)
+	}
+	for i := range r.Tools {
+		r.Tools[i].Tool = redactor.RedactString(r.Tools[i].Tool)
+		r.Tools[i].Version = redactor.RedactString(r.Tools[i].Version)
+		r.Tools[i].Image = redactor.RedactString(r.Tools[i].Image)
+		r.Tools[i].RawPath = redactor.RedactString(r.Tools[i].RawPath)
 	}
 	return r
 }
@@ -104,13 +124,15 @@ var htmlTemplate = template.Must(template.New("report").Parse(`<!doctype html>
   <h2>Findings</h2>
   {{if .Findings}}
   <table>
-    <thead><tr><th>Severity</th><th>Title</th><th>Description</th><th>Remediation</th></tr></thead>
+    <thead><tr><th>Tool</th><th>Severity</th><th>Title</th><th>Description</th><th>Evidence</th><th>Remediation</th></tr></thead>
     <tbody>
     {{range .Findings}}
       <tr>
+        <td>{{.Tool}}</td>
         <td class="sev-{{.Severity}}">{{.Severity}}</td>
         <td>{{.Title}}</td>
         <td>{{.Description}}</td>
+        <td>{{.Evidence}}</td>
         <td>{{.Remediation}}</td>
       </tr>
     {{end}}
@@ -126,6 +148,16 @@ var htmlTemplate = template.Must(template.New("report").Parse(`<!doctype html>
     <thead><tr><th>Tool</th><th>Reason</th></tr></thead>
     <tbody>
     {{range .Skipped}}<tr><td>{{.Tool}}</td><td>{{.Reason}}</td></tr>{{end}}
+    </tbody>
+  </table>
+  {{end}}
+
+  {{if .Tools}}
+  <h2>Tool Metadata</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>Version</th><th>Image</th><th>Raw Artifact</th></tr></thead>
+    <tbody>
+    {{range .Tools}}<tr><td>{{.Tool}}</td><td>{{.Version}}</td><td>{{.Image}}</td><td>{{.RawPath}}</td></tr>{{end}}
     </tbody>
   </table>
   {{end}}

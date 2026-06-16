@@ -141,8 +141,6 @@ profiles:
   quick:
     tools:
       - gitleaks
-      - trivy
-      - semgrep
       - headers
 
 safety:

@@ -101,7 +101,7 @@ Usage:
   scanrail doctor
   scanrail init --non-interactive --project-name demo --target http://localhost:8080
   scanrail setup [--pull-policy never]
-  scanrail run [--profile quick] [--only headers]
+  scanrail run [--profile quick] [--only headers|gitleaks]
   scanrail mcp serve
 
 Options:

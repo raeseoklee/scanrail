@@ -73,14 +73,14 @@ Responsibilities:
 - check Docker availability when Docker-backed tools are selected
 - create workspace directories
 - prepare scanner cache directories
-- pull or validate scanner images in future adapter phases
+- pull or validate pinned scanner images
 - write or validate a scanner lock file
 
 ### 3. Scan Execution
 
 `scanrail run` executes the selected profile and writes normalized reports.
 
-The first release candidate implements the native security headers scanner. Docker-backed adapters for Gitleaks, Trivy, and Semgrep are part of the planned v0.x surface.
+The current MVP implements the native security headers scanner and the Docker-backed Gitleaks secrets adapter. Docker-backed adapters for Trivy and Semgrep remain part of the planned v0.x surface.
 
 ### 4. Reporting
 

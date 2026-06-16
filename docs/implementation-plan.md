@@ -253,7 +253,7 @@ Acceptance:
 
 Goal:
 
-- Add first Docker-backed scanner adapters with golden output normalization.
+- Add the first Docker-backed scanner adapter with golden output normalization.
 
 Files:
 
@@ -267,7 +267,7 @@ testdata/scanners/
 Tasks:
 
 1. Implement Gitleaks command generation.
-2. Implement Trivy filesystem scan command generation.
+2. Keep Trivy and Semgrep behind the production-readiness gate until their command generation and normalization are implemented.
 3. Implement Semgrep command generation.
 4. Add raw output parsers.
 5. Add golden normalization fixtures.
@@ -404,8 +404,8 @@ Acceptance:
 
 Ship v0.1 when these are complete:
 
-- Phase 0 through Phase 7.
-- `headers`, `gitleaks`, `trivy`, and `semgrep` adapters.
+- Phase 0 through the first Phase 7 slice.
+- `headers` and `gitleaks` adapters.
 - JSON and HTML reports.
 - npm wrapper dry-run.
 - Linux/macOS/Windows test matrix.

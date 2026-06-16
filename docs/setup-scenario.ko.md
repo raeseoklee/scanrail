@@ -10,7 +10,7 @@
 npm install -g scanrail
 ```
 
-첫 공개 릴리스 전에는 npm 설치를 기본 경로로 사용합니다. release archive와 설치 스크립트는 릴리스 자동화가 준비된 뒤 추가합니다.
+npm 설치를 기본 경로로 사용합니다. release archive와 설치 스크립트는 릴리스 자동화가 더 성숙한 뒤 추가합니다.
 
 ## 2. 환경 점검
 
@@ -24,15 +24,14 @@ scanrail doctor
 Scanrail Doctor
 
 Docker              OK   Docker Desktop running
-Docker Compose      OK
-Network             OK
 Workspace           OK   /Users/dev/workspace/my-order-api
 Git repo            OK
 Disk space          OK
-Internet access     OK   scanner image pull available
 
 Ready.
 ```
+
+Docker를 사용할 수 없는 환경에서는 native headers scanner만 실행할 수 있습니다.
 
 ## 3. 초기 설정
 
@@ -122,8 +121,6 @@ profiles:
   quick:
     tools:
       - gitleaks
-      - trivy
-      - semgrep
       - headers
 
 safety:
@@ -146,7 +143,6 @@ report:
   formats:
     - html
     - json
-    - sarif
 ```
 
 `.env.scanrail.example`
@@ -166,18 +162,13 @@ scanrail setup
 ```text
 Preparing Scanrail runtime
 
-Docker network       created scanrail-net
 Reports directory    created .scanrail/reports
 Cache directory      created .scanrail/cache
 
 Pulling scanners
 - gitleaks            OK
-- trivy               OK
-- semgrep             OK
-
-Updating scanner data
-- trivy DB            OK
-- semgrep rules       OK
+- trivy               SKIP image version not pinned yet
+- semgrep             SKIP image version not pinned yet
 
 Generated tools.lock.yaml
 Setup complete.
@@ -208,18 +199,15 @@ OpenAPI       ./openapi.yaml
 Auth          bearer via SCANRAIL_TOKEN
 
 Running checks
-[1/4] Gitleaks secrets scan        PASS
-[2/4] Trivy dependency scan        WARN   3 findings
-[3/4] Semgrep SAST                 WARN   5 findings
-[4/4] Security headers             WARN   2 findings
+[1/2] Gitleaks secrets scan        PASS
+[2/2] Security headers             WARN   2 findings
 
 Policy result
-FAILED: high severity finding exists
+PASSED
 
 Reports
 HTML   .scanrail/reports/my-order-api-20260612-1430.html
 JSON   .scanrail/reports/my-order-api-20260612-1430.json
-SARIF  .scanrail/reports/my-order-api-20260612-1430.sarif
 ```
 
 ## 7. Full Scan 보호

@@ -40,8 +40,6 @@ profiles:
   quick:
     tools:
       - gitleaks
-      - trivy
-      - semgrep
       - headers
 
 safety:
@@ -162,10 +160,11 @@ profiles:
   default: quick
   quick:
     tools:
+      - gitleaks
       - headers
 ```
 
-The first release candidate should generate a `quick` profile that only includes implemented adapters. Extended profiles belong in examples until their adapters are executable.
+The current generated `quick` profile only includes implemented adapters: Docker-backed `gitleaks` and native `headers`. Extended profiles belong in examples until their adapters are executable.
 
 ## `safety`
 
