@@ -3,6 +3,8 @@ package app
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -84,5 +86,42 @@ func TestExplicitUnreadyAdapterFailsSafety(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "not production-ready") {
 		t.Fatalf("safety output missing reason: %s", out.String())
+	}
+}
+
+func TestRunOnlyTLSPersistsFindings(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	cfg := config.Defaults(dir)
+	cfg.ProjectName = "demo"
+	cfg.TargetURL = server.URL
+	cfg.FailOn = "critical"
+	if err := config.WriteInitial("scanrail.yaml", cfg, false); err != nil {
+		t.Fatal(err)
+	}
+
+	var out bytes.Buffer
+	code := Run(context.Background(), RunOptions{Only: "tls"}, &out)
+	if code != exitcode.OK {
+		t.Fatalf("Run exit code = %d, output: %s", code, out.String())
+	}
+	reports, err := filepath.Glob(filepath.Join(dir, ".scanrail", "reports", "*.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(reports) != 1 {
+		t.Fatalf("reports = %#v", reports)
+	}
+	data, err := os.ReadFile(reports[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"tool": "tls"`) {
+		t.Fatalf("report missing tls finding: %s", string(data))
 	}
 }

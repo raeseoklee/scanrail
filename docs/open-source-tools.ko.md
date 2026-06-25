@@ -14,7 +14,7 @@
 | Secrets | Gitleaks | 하드코딩된 토큰/키 탐지 | v0.1 |
 | DAST | OWASP ZAP | 웹 런타임 취약점 점검 | v0.2 |
 | 템플릿 기반 스캔 | Nuclei | CVE/설정/노출 패턴 점검 | v0.2 |
-| TLS | testssl.sh | TLS/인증서 설정 점검 | v0.2 |
+| TLS | native Go checker, 이후 testssl.sh | TLS/인증서 설정 점검 | v0.2 |
 | API 테스트 | Schemathesis | OpenAPI 기반 API property/fuzz 테스트 | v0.2 |
 | 결과 연동 | SARIF | code scanning 결과 연동 | v0.1 partial |
 
@@ -31,7 +31,7 @@
 
 ## 도구별 역할
 
-현재 MVP에서 실제 실행되는 scanner는 native headers checker와 Docker 기반 Gitleaks adapter입니다. Trivy와 Semgrep은 adapter surface와 safety gate를 먼저 유지하고, 실행 adapter는 이후 버전에서 추가합니다.
+현재 MVP에서 실제 실행되는 scanner는 native headers checker, native TLS certificate baseline checker, Docker 기반 Gitleaks adapter입니다. Trivy와 Semgrep은 adapter surface와 safety gate를 먼저 유지하고, 실행 adapter는 이후 버전에서 추가합니다.
 
 ### OWASP ZAP
 
@@ -115,6 +115,20 @@
 
 - HTTPS target이 있을 때만 실행
 - 결과는 JSON 또는 파싱 가능한 텍스트로 수집
+
+### Native TLS Checker
+
+역할:
+
+- certificate trust, hostname coverage, expiry 점검
+- negotiated TLS version이 TLS 1.2 미만인지 탐지
+- testssl.sh adapter 이전에 Docker 없는 HTTPS baseline 제공
+
+초기 정책:
+
+- HTTPS target에서만 실행
+- HTTP payload 없이 단일 TLS handshake만 수행
+- cipher-suite/protocol matrix 수준의 상세 점검은 이후 testssl.sh adapter로 확장
 
 ### Schemathesis
 

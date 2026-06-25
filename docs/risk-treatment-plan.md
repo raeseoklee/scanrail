@@ -8,7 +8,7 @@ Last reviewed: June 16, 2026.
 
 ## Current Decision
 
-There is no known remaining release blocker for the current headers plus Gitleaks MVP when the release checklist and verification gates pass.
+There is no known remaining release blocker for the current headers, TLS, and Gitleaks MVP when the release checklist and verification gates pass.
 
 The remaining risks are expansion gates:
 

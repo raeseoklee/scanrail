@@ -28,7 +28,7 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --profile quick
 ```
 
-The current MVP includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, a native security headers scanner, and a Docker-backed Gitleaks secrets adapter. Use `scanrail run --only headers` without Docker, or `scanrail run --only gitleaks` for the secrets scan only. Trivy and Semgrep adapters are planned.
+The current MVP includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, native security headers and TLS certificate baseline scanners, and a Docker-backed Gitleaks secrets adapter. Use `scanrail run --only headers` or `scanrail run --only tls` without Docker, or `scanrail run --only gitleaks` for the secrets scan only. Trivy and Semgrep adapters are planned.
 
 ## MCP
 

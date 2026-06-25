@@ -8,7 +8,7 @@
 
 ## 현재 결정
 
-release checklist와 verification gate가 통과한다면 현재 headers + Gitleaks MVP에는 알려진 release blocker가 없습니다.
+release checklist와 verification gate가 통과한다면 현재 headers, TLS, Gitleaks MVP에는 알려진 release blocker가 없습니다.
 
 남은 리스크는 기능 확장 gate로 관리합니다.
 

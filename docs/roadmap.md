@@ -41,6 +41,7 @@ Goal:
 
 Features:
 
+- native TLS certificate baseline (`0.2.0` shipped)
 - OWASP ZAP baseline
 - ZAP OpenAPI scan
 - Nuclei safe templates
@@ -56,6 +57,8 @@ Completion criteria:
 - authenticated staging API checks are possible
 - OpenAPI scan results appear in HTML reports
 - active scans do not run without explicit opt-in
+
+Status note: `0.2.0` ships the native TLS baseline only. ZAP, Nuclei, Schemathesis, testssl.sh, and OpenAPI scanning remain planned under this milestone.
 
 ## v0.3: CI/CD Integration
 

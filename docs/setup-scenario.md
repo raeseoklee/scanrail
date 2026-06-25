@@ -112,6 +112,7 @@ profiles:
     tools:
       - gitleaks
       - headers
+      - tls
 
 report:
   output_dir: .scanrail/reports
@@ -142,6 +143,12 @@ For a Docker-free native headers check:
 
 ```bash
 scanrail run --only headers
+```
+
+For a Docker-free TLS certificate baseline check:
+
+```bash
+scanrail run --only tls
 ```
 
 For the Docker-backed secrets scanner only:

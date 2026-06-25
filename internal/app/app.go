@@ -19,6 +19,7 @@ import (
 	"github.com/raeseoklee/scanrail/internal/scanners"
 	"github.com/raeseoklee/scanrail/internal/scanners/gitleaks"
 	"github.com/raeseoklee/scanrail/internal/scanners/headers"
+	"github.com/raeseoklee/scanrail/internal/scanners/tlscheck"
 	"github.com/raeseoklee/scanrail/internal/version"
 	"github.com/raeseoklee/scanrail/internal/workspace"
 )
@@ -247,6 +248,17 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 			}
 			runReport.Findings = append(runReport.Findings, result.Findings...)
 			runReport.Tools = append(runReport.Tools, result.Metadata)
+		case "tls":
+			findings, err := tlscheck.Scan(ctx, cfg.TargetURL)
+			if err != nil {
+				if opts.Only == "tls" {
+					fmt.Fprintln(stdout, "tls failed:", redactor.RedactString(err.Error()))
+					return exitcode.ConfigError
+				}
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "tls", Reason: redactor.RedactString(err.Error())})
+				continue
+			}
+			runReport.Findings = append(runReport.Findings, findings...)
 		case "trivy", "semgrep":
 			runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: definition.SkipReason})
 		default:

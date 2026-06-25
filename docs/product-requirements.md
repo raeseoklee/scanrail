@@ -80,7 +80,7 @@ Responsibilities:
 
 `scanrail run` executes the selected profile and writes normalized reports.
 
-The current MVP implements the native security headers scanner and the Docker-backed Gitleaks secrets adapter. Docker-backed adapters for Trivy and Semgrep remain part of the planned v0.x surface.
+The current MVP implements the native security headers scanner, the native TLS certificate baseline scanner, and the Docker-backed Gitleaks secrets adapter. Docker-backed adapters for Trivy and Semgrep remain part of the planned v0.x surface.
 
 ### 4. Reporting
 

@@ -43,6 +43,7 @@ Current MVP enforcement:
 - Trivy and Semgrep remain non-production-ready and are skipped in profile execution.
 - Explicit execution of a non-production-ready scanner fails with safety exit code `5`.
 - The native headers scanner does not follow redirects and declares `allowlist_scope`, `redirect_scope`, `rate_limit`, and `header_injection`.
+- The native TLS scanner performs one TLS handshake for HTTPS targets, sends no HTTP payload, and declares `allowlist_scope`, `redirect_scope`, and `rate_limit`.
 
 Network-level enforcement through a dedicated Docker network and egress proxy is a later v0.x design.
 
@@ -86,7 +87,7 @@ Policy:
 - `interactive` requires staging targets, allowlists, blocked paths, and rate-limit capabilities.
 - `active` requires explicit opt-in, such as an `--i-understand-active-scan` style flag.
 
-Schemathesis, ZAP API scans, and intrusive Nuclei templates are at least `interactive`, regardless of profile name.
+The native TLS scanner is classified as `interactive` because it opens a network connection, but its current implementation only performs a single TLS handshake. Schemathesis, ZAP API scans, and intrusive Nuclei templates are at least `interactive`, regardless of profile name.
 
 ## Production Targets
 

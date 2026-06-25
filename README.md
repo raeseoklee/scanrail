@@ -21,7 +21,7 @@ Scanrail does not try to reimplement a commercial SAST or DAST engine. Its job i
 
 ## Direction
 
-The long-term model is to orchestrate tools such as OWASP ZAP, Nuclei, Semgrep, Trivy, and Gitleaks through isolated adapters, usually Docker-backed. The current MVP provides the CLI scaffold, configuration flow, report generation, npm wrapper distribution, a native security headers scanner, and a Docker-backed Gitleaks secrets adapter.
+The long-term model is to orchestrate tools such as OWASP ZAP, Nuclei, Semgrep, Trivy, and Gitleaks through isolated adapters, usually Docker-backed. The current MVP provides the CLI scaffold, configuration flow, report generation, npm wrapper distribution, a native security headers scanner, a native TLS certificate baseline scanner, and a Docker-backed Gitleaks secrets adapter.
 
 ```text
 scanrail init
@@ -45,14 +45,14 @@ npm install -g scanrail
 scanrail doctor
 ```
 
-Run the default quick profile, which checks local secrets with Gitleaks and web response headers when a target is configured:
+Run the default quick profile, which checks local secrets with Gitleaks and checks web response headers plus TLS certificate posture when a target is configured:
 
 ```bash
 scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --profile quick
 ```
 
-Use `scanrail run --only headers` when Docker is unavailable, or `scanrail run --only gitleaks` to run only the Docker-backed secrets scan.
+Use `scanrail run --only headers` or `scanrail run --only tls` when Docker is unavailable, or `scanrail run --only gitleaks` to run only the Docker-backed secrets scan.
 
 The npm package installs a thin JavaScript command wrapper plus the matching Go binary package for macOS, Windows, or Linux. The scoped `@scanrail/cli` package remains available as the underlying wrapper package. Docker-backed Trivy and Semgrep adapters are still planned; their real command/output contracts are captured in the [Scanner Adapter Spike](docs/experiments/scanner-adapter-spike.md).
 
@@ -81,7 +81,7 @@ The stdio MCP path can be regression-tested with [MCP Workbench](examples/mcp-wo
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
 - [npm Publish Runbook](docs/npm-publish.md)
-- [Release Notes 0.1.4](docs/releases/0.1.4.md)
+- [Release Notes 0.2.0](docs/releases/0.2.0.md)
 - [Release Checklist](docs/release-checklist.md)
 - [Release Risk Register](docs/release-risk-register.md)
 - [Risk Treatment Plan](docs/risk-treatment-plan.md)
@@ -112,6 +112,7 @@ The current MVP supports:
 - `scanrail setup`
 - `scanrail run --only headers`
 - `scanrail run --only gitleaks`
+- `scanrail run --only tls`
 - `scanrail run --profile quick`
 - `scanrail mcp serve`
 - JSON and HTML report generation
@@ -119,7 +120,7 @@ The current MVP supports:
 - platform-specific binary packages for macOS, Windows, and Linux
 - release dry-run automation
 
-Docker-backed Trivy and Semgrep adapters remain planned. Gitleaks is the first Docker-backed adapter, using the pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image and redacted raw artifacts.
+Docker-backed Trivy and Semgrep adapters remain planned. Gitleaks is the first Docker-backed adapter, using the pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image and redacted raw artifacts. The native TLS scanner performs a single TLS handshake for HTTPS targets and reports certificate trust, hostname, expiry, and legacy protocol findings.
 
 ## Development
 

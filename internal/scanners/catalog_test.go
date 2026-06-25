@@ -7,7 +7,7 @@ import (
 
 func TestDefaultToolsOnlyIncludesProductionReadyAdapters(t *testing.T) {
 	tools := DefaultTools()
-	if !slices.Equal(tools, []string{"gitleaks", "headers"}) {
+	if !slices.Equal(tools, []string{"gitleaks", "headers", "tls"}) {
 		t.Fatalf("DefaultTools() = %#v", tools)
 	}
 	for _, tool := range tools {

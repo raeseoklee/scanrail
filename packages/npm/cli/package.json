@@ -1,6 +1,6 @@
 {
   "name": "@scanrail/cli",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Developer-first security scan orchestrator",
   "license": "Apache-2.0",
   "repository": {
@@ -20,12 +20,12 @@
     "README.md"
   ],
   "optionalDependencies": {
-    "@scanrail/cli-darwin-arm64": "0.1.4",
-    "@scanrail/cli-darwin-x64": "0.1.4",
-    "@scanrail/cli-linux-arm64": "0.1.4",
-    "@scanrail/cli-linux-x64": "0.1.4",
-    "@scanrail/cli-win32-arm64": "0.1.4",
-    "@scanrail/cli-win32-x64": "0.1.4"
+    "@scanrail/cli-darwin-arm64": "0.2.0",
+    "@scanrail/cli-darwin-x64": "0.2.0",
+    "@scanrail/cli-linux-arm64": "0.2.0",
+    "@scanrail/cli-linux-x64": "0.2.0",
+    "@scanrail/cli-win32-arm64": "0.2.0",
+    "@scanrail/cli-win32-x64": "0.2.0"
   },
   "publishConfig": {
     "access": "public"
@@ -36,6 +36,8 @@
     "devsecops",
     "sast",
     "dast",
+    "tls",
+    "certificate",
     "semgrep",
     "trivy",
     "gitleaks",

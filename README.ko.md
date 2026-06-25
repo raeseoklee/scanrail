@@ -19,7 +19,7 @@
 
 ## 핵심 방향
 
-`scanrail`은 자체 취약점 탐지 엔진을 처음부터 만들지 않습니다. 대신 OWASP ZAP, Nuclei, Semgrep, Trivy, Gitleaks 같은 오픈소스 도구를 격리된 adapter로 실행하고, 결과를 하나의 형식으로 모아 개발자에게 제공합니다. 현재 MVP는 native security headers scanner와 Docker 기반 Gitleaks secrets adapter를 제공합니다.
+`scanrail`은 자체 취약점 탐지 엔진을 처음부터 만들지 않습니다. 대신 OWASP ZAP, Nuclei, Semgrep, Trivy, Gitleaks 같은 오픈소스 도구를 격리된 adapter로 실행하고, 결과를 하나의 형식으로 모아 개발자에게 제공합니다. 현재 MVP는 native security headers scanner, native TLS certificate baseline scanner, Docker 기반 Gitleaks secrets adapter를 제공합니다.
 
 ```text
 scanrail init
@@ -43,14 +43,14 @@ npm install -g scanrail
 scanrail doctor
 ```
 
-기본 quick profile은 Gitleaks로 로컬 secret을 점검하고, web target이 있으면 security headers도 함께 점검합니다.
+기본 quick profile은 Gitleaks로 로컬 secret을 점검하고, web target이 있으면 security headers와 TLS 인증서 상태도 함께 점검합니다.
 
 ```bash
 scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --profile quick
 ```
 
-Docker를 사용할 수 없으면 `scanrail run --only headers`로 native headers 점검만 실행할 수 있고, `scanrail run --only gitleaks`로 Docker 기반 secret scan만 실행할 수 있습니다.
+Docker를 사용할 수 없으면 `scanrail run --only headers` 또는 `scanrail run --only tls`로 native 점검만 실행할 수 있고, `scanrail run --only gitleaks`로 Docker 기반 secret scan만 실행할 수 있습니다.
 
 npm package는 얇은 JavaScript command wrapper와 현재 OS/CPU에 맞는 Go binary package를 설치합니다. scoped `@scanrail/cli` package는 내부 wrapper package로 계속 사용할 수 있습니다. Docker 기반 Trivy, Semgrep adapter는 다음 구현 대상이며, 실제 command/output 계약은 [Scanner Adapter 실증](docs/experiments/scanner-adapter-spike.ko.md)에 남겨두었습니다.
 
@@ -79,7 +79,7 @@ stdio MCP 경로는 [MCP Workbench 검증](examples/mcp-workbench/README.ko.md)�
 - [OSS 전략](docs/oss-strategy.ko.md)
 - [배포 전략](docs/distribution.ko.md)
 - [npm Publish Runbook](docs/npm-publish.ko.md)
-- [릴리스 노트 0.1.4](docs/releases/0.1.4.ko.md)
+- [릴리스 노트 0.2.0](docs/releases/0.2.0.ko.md)
 - [Release Checklist](docs/release-checklist.ko.md)
 - [릴리스 리스크 레지스터](docs/release-risk-register.ko.md)
 - [리스크 처리 계획](docs/risk-treatment-plan.ko.md)
@@ -110,13 +110,14 @@ Scanner adapter 실증:
 - `scanrail setup`
 - `scanrail run --only headers`
 - `scanrail run --only gitleaks`
+- `scanrail run --only tls`
 - `scanrail run --profile quick`
 - `scanrail mcp serve`
 - JSON, HTML 리포트 생성
 - macOS, Windows, Linux용 npm wrapper와 platform binary package
 - release dry-run 자동화
 
-Gitleaks는 `ghcr.io/gitleaks/gitleaks:v8.30.1`로 고정된 첫 Docker 기반 adapter입니다. Trivy, Semgrep adapter와 SARIF 리포트는 다음 단계에서 구현합니다.
+Gitleaks는 `ghcr.io/gitleaks/gitleaks:v8.30.1`로 고정된 첫 Docker 기반 adapter입니다. native TLS scanner는 HTTPS target에 단일 TLS handshake를 수행하고 certificate trust, hostname, expiry, legacy protocol finding을 리포트합니다. Trivy, Semgrep adapter와 SARIF 리포트는 다음 단계에서 구현합니다.
 
 ## 개발
 
@@ -127,7 +128,7 @@ node scripts/build-release.mjs
 npm pack --workspaces --dry-run
 ```
 
-현재 MVP는 `doctor`, `init --non-interactive`, `setup`, `run --only headers`, `run --only gitleaks`, `mcp serve`를 지원합니다. Trivy, Semgrep adapter는 패키징 골격과 실행 정책을 유지하고, scanner별 command generation과 normalization을 다음 단계에서 채웁니다.
+현재 MVP는 `doctor`, `init --non-interactive`, `setup`, `run --only headers`, `run --only gitleaks`, `run --only tls`, `mcp serve`를 지원합니다. Trivy, Semgrep adapter는 패키징 골격과 실행 정책을 유지하고, scanner별 command generation과 normalization을 다음 단계에서 채웁니다.
 
 ## 라이선스
 

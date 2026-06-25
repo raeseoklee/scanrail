@@ -111,6 +111,7 @@ Runs a scan profile or a selected scanner.
 scanrail run --profile quick
 scanrail run --only headers
 scanrail run --only gitleaks
+scanrail run --only tls
 scanrail run --target https://staging.example.com
 ```
 
@@ -130,6 +131,7 @@ Target behavior:
 - Safety capability mismatches fail explicit execution and are recorded for profile execution.
 - `gitleaks` requires Docker and scans the local workspace through a read-only bind mount.
 - `headers` is native Go code and does not require Docker.
+- `tls` is native Go code and performs a single TLS handshake against HTTPS targets.
 
 ## `scanrail version`
 

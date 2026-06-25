@@ -142,6 +142,7 @@ profiles:
     tools:
       - gitleaks
       - headers
+      - tls
 
 safety:
   active_scan_default: false

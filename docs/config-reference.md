@@ -41,6 +41,7 @@ profiles:
     tools:
       - gitleaks
       - headers
+      - tls
 
 safety:
   active_scan_default: false
@@ -162,9 +163,10 @@ profiles:
     tools:
       - gitleaks
       - headers
+      - tls
 ```
 
-The current generated `quick` profile only includes implemented adapters: Docker-backed `gitleaks` and native `headers`. Extended profiles belong in examples until their adapters are executable.
+The current generated `quick` profile only includes implemented adapters: Docker-backed `gitleaks`, native `headers`, and native `tls`. Extended profiles belong in examples until their adapters are executable.
 
 ## `safety`
 

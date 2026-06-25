@@ -14,11 +14,11 @@ Scanrail combines specialized open-source scanners and presents their results th
 | Secrets | Gitleaks | hardcoded token/key detection | v0.1 |
 | DAST | OWASP ZAP | runtime web vulnerability checks | v0.2 |
 | Template scanning | Nuclei | CVE, misconfiguration, exposure checks | v0.2 |
-| TLS | testssl.sh | TLS and certificate checks | v0.2 |
+| TLS | native Go checker, later testssl.sh | TLS and certificate checks | v0.2 |
 | API testing | Schemathesis | OpenAPI-based property and fuzz testing | v0.2 |
 | Result integration | SARIF | code scanning integration | v0.1 partial |
 
-The current MVP executes the native headers scanner and the Docker-backed Gitleaks adapter. Other scanner names remain part of the planned adapter surface.
+The current MVP executes the native headers scanner, the native TLS certificate baseline scanner, and the Docker-backed Gitleaks adapter. Other scanner names remain part of the planned adapter surface.
 
 ## Additional Candidates
 
@@ -121,6 +121,20 @@ Initial checks:
 - X-Frame-Options
 - Referrer-Policy
 - Strict-Transport-Security for HTTPS targets
+
+### Native TLS Checker
+
+Role:
+
+- check certificate trust, hostname coverage, and expiry
+- detect legacy negotiated TLS versions below TLS 1.2
+- provide a zero-Docker HTTPS baseline before a full testssl.sh adapter
+
+Initial policy:
+
+- run only for HTTPS targets
+- perform a single TLS handshake without sending HTTP payloads
+- keep broader cipher-suite and protocol matrix checks for a later testssl.sh adapter
 
 ## Adapter Requirements
 

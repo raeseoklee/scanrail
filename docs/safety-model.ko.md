@@ -43,6 +43,7 @@ auth_injection
 - Trivy와 Semgrep은 아직 production-ready가 아니므로 profile 실행에서 skip합니다.
 - production-ready가 아닌 scanner를 명시 실행하면 safety exit code `5`로 실패합니다.
 - native headers scanner는 redirect를 따르지 않고 `allowlist_scope`, `redirect_scope`, `rate_limit`, `header_injection`을 선언합니다.
+- native TLS scanner는 HTTPS target에 단일 TLS handshake만 수행하고 HTTP payload를 보내지 않으며 `allowlist_scope`, `redirect_scope`, `rate_limit`을 선언합니다.
 
 네트워크 레벨 강제 모델은 v0.x 후속 과제입니다. 이 방식은 전용 Docker network와 egress proxy를 두고 allowlist, path, method, RPS를 프록시에서 강제하는 구조입니다.
 
@@ -86,7 +87,7 @@ active       공격성 payload, active DAST, intrusive template 실행
 - `interactive`는 staging target, allowlist, blocked paths, rate limit capability를 요구합니다.
 - `active`는 `--i-understand-active-scan` 같은 명시 플래그가 없으면 실행하지 않습니다.
 
-Schemathesis, ZAP API scan, intrusive Nuclei templates는 profile 이름과 무관하게 최소 `interactive`로 취급합니다.
+native TLS scanner는 네트워크 연결을 만들기 때문에 `interactive`로 분류하지만, 현재 구현은 단일 TLS handshake만 수행합니다. Schemathesis, ZAP API scan, intrusive Nuclei templates는 profile 이름과 무관하게 최소 `interactive`로 취급합니다.
 
 ## Active Scan 보호
 

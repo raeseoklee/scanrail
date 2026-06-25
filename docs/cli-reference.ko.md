@@ -123,6 +123,7 @@ scanrail run
 scanrail run --profile quick
 scanrail run --only headers
 scanrail run --only gitleaks
+scanrail run --only tls
 ```
 
 확장 profile을 설정한 경우:
@@ -163,6 +164,7 @@ exit code:
 
 - `gitleaks`는 Docker가 필요하며 local workspace를 read-only bind mount로 스캔합니다.
 - `headers`는 native Go scanner라 Docker가 없어도 실행할 수 있습니다.
+- `tls`는 native Go scanner이며 HTTPS target에 단일 TLS handshake를 수행합니다.
 - profile에 포함된 scanner가 실행 조건을 만족하지 못하면 skip reason을 report에 남깁니다.
 - `--only`로 명시한 scanner가 실행 조건을 만족하지 못하면 실패합니다.
 

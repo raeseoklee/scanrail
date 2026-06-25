@@ -31,7 +31,7 @@ Disk space          OK
 Ready.
 ```
 
-Docker를 사용할 수 없는 환경에서는 native headers scanner만 실행할 수 있습니다.
+Docker를 사용할 수 없는 환경에서는 native headers 또는 TLS scanner만 실행할 수 있습니다.
 
 ## 3. 초기 설정
 
@@ -122,6 +122,7 @@ profiles:
     tools:
       - gitleaks
       - headers
+      - tls
 
 safety:
   active_scan_default: false
@@ -199,8 +200,9 @@ OpenAPI       ./openapi.yaml
 Auth          bearer via SCANRAIL_TOKEN
 
 Running checks
-[1/2] Gitleaks secrets scan        PASS
-[2/2] Security headers             WARN   2 findings
+[1/3] Gitleaks secrets scan        PASS
+[2/3] Security headers             WARN   2 findings
+[3/3] TLS baseline                 PASS
 
 Policy result
 PASSED

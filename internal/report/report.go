@@ -109,6 +109,7 @@ var htmlTemplate = template.Must(template.New("report").Parse(`<!doctype html>
     table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
     th, td { border: 1px solid #d8dee4; padding: .6rem; text-align: left; vertical-align: top; }
     th { background: #f6f8fa; }
+    .sev-critical, .sev-high { color: #cf222e; font-weight: 700; }
     .sev-medium { color: #9a6700; font-weight: 700; }
     .sev-low { color: #0969da; font-weight: 700; }
     .empty { color: #57606a; }
