@@ -144,6 +144,18 @@ func TestScanRequiresLocalSpecPath(t *testing.T) {
 	}
 }
 
+func TestURLSpecPathDetectionAllowsWindowsAbsolutePaths(t *testing.T) {
+	if isURLSpecPath(`C:\work\api\openapi.json`) {
+		t.Fatal("Windows absolute paths must be treated as local files")
+	}
+	if !isURLSpecPath("https://example.com/openapi.yaml") {
+		t.Fatal("HTTPS OpenAPI specs must still be rejected")
+	}
+	if !isURLSpecPath("file:///tmp/openapi.yaml") {
+		t.Fatal("file URLs are not accepted by the local path scanner")
+	}
+}
+
 func hasFinding(findings []report.Finding, id string, severity string) bool {
 	for _, finding := range findings {
 		if finding.ID == id && finding.Severity == severity {

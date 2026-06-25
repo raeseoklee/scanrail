@@ -30,7 +30,7 @@ func Scan(ctx context.Context, opts Options) ([]report.Finding, error) {
 	if path == "" {
 		return nil, errors.New("openapi scanner requires targets.api.openapi")
 	}
-	if parsed, err := url.Parse(path); err == nil && parsed.Scheme != "" {
+	if isURLSpecPath(path) {
 		return nil, errors.New("openapi scanner supports local OpenAPI files only in this release")
 	}
 	if !filepath.IsAbs(path) {
@@ -426,6 +426,17 @@ func leadingSpaces(s string) int {
 func isPlainHTTPServer(raw string) bool {
 	parsed, err := url.Parse(raw)
 	return err == nil && strings.EqualFold(parsed.Scheme, "http")
+}
+
+func isURLSpecPath(raw string) bool {
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed.Scheme == "" {
+		return false
+	}
+	if len(parsed.Scheme) == 1 && len(raw) > 1 && raw[1] == ':' {
+		return false
+	}
+	return true
 }
 
 func hasClientErrorResponse(responses []string) bool {
