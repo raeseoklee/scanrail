@@ -125,3 +125,55 @@ func TestRunOnlyTLSPersistsFindings(t *testing.T) {
 		t.Fatalf("report missing tls finding: %s", string(data))
 	}
 }
+
+func TestRunOnlyOpenAPIPersistsFindings(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	spec := `{
+  "openapi": "3.1.0",
+  "servers": [{"url": "https://api.example.com"}],
+  "paths": {
+    "/orders": {
+      "post": {
+        "responses": {
+          "200": {"description": "ok"}
+        }
+      }
+    }
+  }
+}`
+	if err := os.WriteFile("openapi.json", []byte(spec), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := config.Defaults(dir)
+	cfg.ProjectName = "demo"
+	cfg.OpenAPIPath = "./openapi.json"
+	cfg.FailOn = "critical"
+	if err := config.WriteInitial("scanrail.yaml", cfg, false); err != nil {
+		t.Fatal(err)
+	}
+
+	var out bytes.Buffer
+	code := Run(context.Background(), RunOptions{Only: "openapi"}, &out)
+	if code != exitcode.OK {
+		t.Fatalf("Run exit code = %d, output: %s", code, out.String())
+	}
+	reports, err := filepath.Glob(filepath.Join(dir, ".scanrail", "reports", "*.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(reports) != 1 {
+		t.Fatalf("reports = %#v", reports)
+	}
+	data, err := os.ReadFile(reports[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"tool": "openapi"`) {
+		t.Fatalf("report missing openapi finding: %s", string(data))
+	}
+	if !strings.Contains(string(data), `"id": "openapi.operation.missing_security"`) {
+		t.Fatalf("report missing openapi security finding: %s", string(data))
+	}
+}

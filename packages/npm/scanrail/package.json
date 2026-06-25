@@ -1,6 +1,6 @@
 {
   "name": "scanrail",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Developer-first security scan orchestrator",
   "license": "Apache-2.0",
   "repository": {
@@ -20,7 +20,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@scanrail/cli": "0.2.0"
+    "@scanrail/cli": "0.2.1"
   },
   "publishConfig": {
     "access": "public"

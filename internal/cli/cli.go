@@ -56,6 +56,7 @@ func runInit(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.StringVar(&opts.ConfigPath, "config", "scanrail.yaml", "config path")
 	fs.StringVar(&opts.ProjectName, "project-name", "", "project name")
 	fs.StringVar(&opts.Target, "target", "", "web target URL")
+	fs.StringVar(&opts.OpenAPI, "openapi", "", "OpenAPI spec path")
 	fs.StringVar(&opts.Profile, "profile", "quick", "default profile")
 	fs.BoolVar(&opts.Force, "force", false, "overwrite existing files")
 	if err := fs.Parse(args); err != nil {
@@ -86,6 +87,7 @@ func runScan(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.StringVar(&opts.ConfigPath, "config", "scanrail.yaml", "config path")
 	fs.StringVar(&opts.Profile, "profile", "", "profile")
 	fs.StringVar(&opts.Target, "target", "", "web target URL")
+	fs.StringVar(&opts.OpenAPI, "openapi", "", "OpenAPI spec path")
 	fs.StringVar(&opts.Only, "only", "", "run only one tool")
 	fs.StringVar(&opts.OutputDir, "output-dir", "", "report output directory")
 	if err := fs.Parse(args); err != nil {
@@ -101,7 +103,7 @@ Usage:
   scanrail doctor
   scanrail init --non-interactive --project-name demo --target http://localhost:8080
   scanrail setup [--pull-policy never]
-  scanrail run [--profile quick] [--only headers|gitleaks|tls]
+  scanrail run [--profile quick] [--only headers|gitleaks|tls|openapi]
   scanrail mcp serve
 
 Options:

@@ -2,6 +2,22 @@
 
 # 변경 기록
 
+## 0.2.1 - 2026-06-25
+
+- local-file-only native OpenAPI baseline scanner를 추가합니다.
+- `scanrail run --only openapi`와 init/run용 `--openapi <path>` override를 추가합니다.
+- `scanrail.yaml`에서 `targets.api.openapi`를 parsing하고 생성되는 quick profile에 `openapi`를 포함합니다.
+- OpenAPI version/server metadata 누락, plain HTTP server URL, effective operation security 누락, client error response 문서 누락 finding을 리포트합니다.
+- OpenAPI baseline surface에 맞춰 README, npm README, CLI/config 문서, roadmap, risk 문서, release note를 갱신합니다.
+
+## 0.2.0 - 2026-06-25
+
+- native TLS certificate/protocol baseline scanner를 추가합니다.
+- `scanrail run --only tls`를 추가하고 생성되는 quick profile에 `tls`를 포함합니다.
+- certificate trust, hostname, expiry, legacy TLS protocol finding을 리포트합니다.
+- broader network scan은 safety gate 뒤에 두고 MCP scanner execution은 headers로 제한합니다.
+- TLS baseline surface에 맞춰 README, npm README, CLI/config/safety 문서, roadmap, risk 문서, release note를 갱신합니다.
+
 ## 0.1.4 - 2026-06-16
 
 - Gitleaks secret detection을 위한 첫 production-ready Docker 기반 scanner adapter를 추가합니다.

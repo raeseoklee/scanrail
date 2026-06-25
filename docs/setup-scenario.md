@@ -113,6 +113,7 @@ profiles:
       - gitleaks
       - headers
       - tls
+      - openapi
 
 report:
   output_dir: .scanrail/reports
@@ -149,6 +150,12 @@ For a Docker-free TLS certificate baseline check:
 
 ```bash
 scanrail run --only tls
+```
+
+Run the local OpenAPI baseline scanner when an API contract is available:
+
+```bash
+scanrail run --only openapi --openapi ./openapi.yaml
 ```
 
 For the Docker-backed secrets scanner only:

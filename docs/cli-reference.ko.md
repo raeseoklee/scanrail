@@ -77,7 +77,7 @@ scanrail init
 --non-interactive       질문 없이 기본값과 옵션으로 설정 생성
 --project-name <name>   프로젝트 이름
 --target <url>          웹 대상 URL
---openapi <path-or-url> OpenAPI spec 경로 또는 URL
+--openapi <path>        local OpenAPI spec 경로
 --profile <name>        기본 profile
 --force                 기존 scanrail.yaml 덮어쓰기
 ```
@@ -124,6 +124,7 @@ scanrail run --profile quick
 scanrail run --only headers
 scanrail run --only gitleaks
 scanrail run --only tls
+scanrail run --only openapi --openapi ./openapi.yaml
 ```
 
 확장 profile을 설정한 경우:
@@ -138,7 +139,7 @@ scanrail run --profile full --i-understand-active-scan
 ```text
 --profile <name>                  실행할 profile
 --target <url>                    일회성 target override
---openapi <path-or-url>           일회성 OpenAPI override
+--openapi <path>                  일회성 local OpenAPI spec override
 --output-dir <path>               report 출력 경로
 --format html,json,sarif          report format override
 --fail-on critical|high|medium    policy fail 기준
@@ -165,6 +166,7 @@ exit code:
 - `gitleaks`는 Docker가 필요하며 local workspace를 read-only bind mount로 스캔합니다.
 - `headers`는 native Go scanner라 Docker가 없어도 실행할 수 있습니다.
 - `tls`는 native Go scanner이며 HTTPS target에 단일 TLS handshake를 수행합니다.
+- `openapi`는 native Go scanner이며 local OpenAPI JSON 또는 일반적인 YAML file을 읽고 API endpoint를 호출하지 않습니다.
 - profile에 포함된 scanner가 실행 조건을 만족하지 못하면 skip reason을 report에 남깁니다.
 - `--only`로 명시한 scanner가 실행 조건을 만족하지 못하면 실패합니다.
 

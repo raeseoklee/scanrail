@@ -19,6 +19,7 @@ import (
 	"github.com/raeseoklee/scanrail/internal/scanners"
 	"github.com/raeseoklee/scanrail/internal/scanners/gitleaks"
 	"github.com/raeseoklee/scanrail/internal/scanners/headers"
+	"github.com/raeseoklee/scanrail/internal/scanners/openapi"
 	"github.com/raeseoklee/scanrail/internal/scanners/tlscheck"
 	"github.com/raeseoklee/scanrail/internal/version"
 	"github.com/raeseoklee/scanrail/internal/workspace"
@@ -28,6 +29,7 @@ type InitOptions struct {
 	ConfigPath  string
 	ProjectName string
 	Target      string
+	OpenAPI     string
 	Profile     string
 	Force       bool
 }
@@ -40,6 +42,7 @@ type RunOptions struct {
 	ConfigPath string
 	Profile    string
 	Target     string
+	OpenAPI    string
 	Only       string
 	OutputDir  string
 }
@@ -80,6 +83,9 @@ func Init(opts InitOptions, stdout io.Writer) int {
 	}
 	if opts.Target != "" {
 		cfg.TargetURL = opts.Target
+	}
+	if opts.OpenAPI != "" {
+		cfg.OpenAPIPath = opts.OpenAPI
 	}
 	if opts.Profile == "" {
 		opts.Profile = "quick"
@@ -155,6 +161,9 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 	}
 	if opts.Target != "" {
 		cfg.TargetURL = opts.Target
+	}
+	if opts.OpenAPI != "" {
+		cfg.OpenAPIPath = opts.OpenAPI
 	}
 	if opts.OutputDir != "" {
 		cfg.OutputDir = opts.OutputDir
@@ -256,6 +265,20 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 					return exitcode.ConfigError
 				}
 				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "tls", Reason: redactor.RedactString(err.Error())})
+				continue
+			}
+			runReport.Findings = append(runReport.Findings, findings...)
+		case "openapi":
+			findings, err := openapi.Scan(ctx, openapi.Options{
+				SpecPath: cfg.OpenAPIPath,
+				WorkDir:  wd,
+			})
+			if err != nil {
+				if opts.Only == "openapi" {
+					fmt.Fprintln(stdout, "openapi failed:", redactor.RedactString(err.Error()))
+					return exitcode.ConfigError
+				}
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: "openapi", Reason: redactor.RedactString(err.Error())})
 				continue
 			}
 			runReport.Findings = append(runReport.Findings, findings...)

@@ -82,7 +82,7 @@
 - pinned scanner image pull 또는 검증
 - `tools.lock.yaml` 생성
 
-현재 MVP는 native security headers scanner, native TLS certificate baseline scanner, Docker 기반 Gitleaks secrets adapter를 구현합니다. Docker 기반 Trivy와 Semgrep adapter는 planned v0.x surface로 남아 있습니다.
+현재 MVP는 native security headers scanner, native TLS certificate baseline scanner, local-file-only native OpenAPI baseline scanner, Docker 기반 Gitleaks secrets adapter를 구현합니다. Docker 기반 Trivy와 Semgrep adapter는 planned v0.x surface로 남아 있습니다.
 
 ### 3. 스캔 프로파일
 

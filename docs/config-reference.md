@@ -42,6 +42,7 @@ profiles:
       - gitleaks
       - headers
       - tls
+      - openapi
 
 safety:
   active_scan_default: false
@@ -119,7 +120,7 @@ targets:
     openapi: ./openapi.yaml
 ```
 
-OpenAPI servers must still pass allowlist validation before interactive API scanning.
+The native OpenAPI scanner currently reads local JSON or common YAML OpenAPI files only. It does not fetch remote specs and does not probe API endpoints. OpenAPI servers must still pass allowlist validation before future interactive API scanning.
 
 ### Container Target
 
@@ -164,9 +165,10 @@ profiles:
       - gitleaks
       - headers
       - tls
+      - openapi
 ```
 
-The current generated `quick` profile only includes implemented adapters: Docker-backed `gitleaks`, native `headers`, and native `tls`. Extended profiles belong in examples until their adapters are executable.
+The current generated `quick` profile only includes implemented adapters: Docker-backed `gitleaks`, native `headers`, native `tls`, and native local-file-only `openapi`. Extended profiles belong in examples until their adapters are executable.
 
 ## `safety`
 

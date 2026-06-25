@@ -123,6 +123,7 @@ profiles:
       - gitleaks
       - headers
       - tls
+      - openapi
 
 safety:
   active_scan_default: false
@@ -200,9 +201,10 @@ OpenAPI       ./openapi.yaml
 Auth          bearer via SCANRAIL_TOKEN
 
 Running checks
-[1/3] Gitleaks secrets scan        PASS
-[2/3] Security headers             WARN   2 findings
-[3/3] TLS baseline                 PASS
+[1/4] Gitleaks secrets scan        PASS
+[2/4] Security headers             WARN   2 findings
+[3/4] TLS baseline                 PASS
+[4/4] OpenAPI baseline             WARN   1 finding
 
 Policy result
 PASSED
@@ -210,6 +212,12 @@ PASSED
 Reports
 HTML   .scanrail/reports/my-order-api-20260612-1430.html
 JSON   .scanrail/reports/my-order-api-20260612-1430.json
+```
+
+API contract만 확인하고 싶으면 다음처럼 실행합니다.
+
+```bash
+scanrail run --only openapi --openapi ./openapi.yaml
 ```
 
 ## 7. Full Scan 보호

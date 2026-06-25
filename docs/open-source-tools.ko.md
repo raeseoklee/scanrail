@@ -31,7 +31,7 @@
 
 ## 도구별 역할
 
-현재 MVP에서 실제 실행되는 scanner는 native headers checker, native TLS certificate baseline checker, Docker 기반 Gitleaks adapter입니다. Trivy와 Semgrep은 adapter surface와 safety gate를 먼저 유지하고, 실행 adapter는 이후 버전에서 추가합니다.
+현재 MVP에서 실제 실행되는 scanner는 native headers checker, native TLS certificate baseline checker, local-file-only native OpenAPI baseline checker, Docker 기반 Gitleaks adapter입니다. Trivy와 Semgrep은 adapter surface와 safety gate를 먼저 유지하고, 실행 adapter는 이후 버전에서 추가합니다.
 
 ### OWASP ZAP
 

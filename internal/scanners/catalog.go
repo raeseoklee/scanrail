@@ -11,7 +11,7 @@ type Definition struct {
 }
 
 func DefaultTools() []string {
-	return []string{"gitleaks", "headers", "tls"}
+	return []string{"gitleaks", "headers", "tls", "openapi"}
 }
 
 func DefinitionFor(name string) (Definition, bool) {
@@ -44,6 +44,11 @@ var definitions = map[string]Definition{
 			RedirectScope:  true,
 			RateLimit:      true,
 		},
+		ProductionReady: true,
+	},
+	"openapi": {
+		Name:            "openapi",
+		Intrusiveness:   safety.IntrusivenessPassive,
 		ProductionReady: true,
 	},
 	"trivy": {

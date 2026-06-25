@@ -2,6 +2,22 @@
 
 # Changelog
 
+## 0.2.1 - 2026-06-25
+
+- Add a native local-file-only OpenAPI baseline scanner.
+- Add `scanrail run --only openapi` and `--openapi <path>` overrides for init/run.
+- Parse `targets.api.openapi` from `scanrail.yaml` and include `openapi` in generated quick profiles.
+- Report OpenAPI findings for missing version/server metadata, plain HTTP server URLs, missing effective operation security, and missing client error responses.
+- Refresh README, npm README files, CLI/config docs, roadmap, risk docs, and release notes for the OpenAPI baseline surface.
+
+## 0.2.0 - 2026-06-25
+
+- Add a native TLS certificate and protocol baseline scanner.
+- Add `scanrail run --only tls` and include `tls` in generated quick profiles.
+- Report certificate trust, hostname, expiry, and legacy TLS protocol findings.
+- Keep MCP scanner execution limited to headers while broader networked scans remain safety-gated.
+- Refresh README, npm README files, CLI/config/safety docs, roadmap, risk docs, and release notes for the TLS baseline surface.
+
 ## 0.1.4 - 2026-06-16
 
 - Add the first production-ready Docker-backed scanner adapter for Gitleaks secrets detection.

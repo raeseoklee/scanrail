@@ -18,7 +18,7 @@ Scanrail combines specialized open-source scanners and presents their results th
 | API testing | Schemathesis | OpenAPI-based property and fuzz testing | v0.2 |
 | Result integration | SARIF | code scanning integration | v0.1 partial |
 
-The current MVP executes the native headers scanner, the native TLS certificate baseline scanner, and the Docker-backed Gitleaks adapter. Other scanner names remain part of the planned adapter surface.
+The current MVP executes the native headers scanner, the native TLS certificate baseline scanner, the native local-file-only OpenAPI baseline scanner, and the Docker-backed Gitleaks adapter. Other scanner names remain part of the planned adapter surface.
 
 ## Additional Candidates
 

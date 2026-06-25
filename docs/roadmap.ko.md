@@ -42,6 +42,7 @@
 기능:
 
 - native TLS certificate baseline (`0.2.0` shipped)
+- native local OpenAPI baseline (`0.2.1` shipped)
 - ZAP OpenAPI scan
 - OWASP ZAP baseline
 - Nuclei safe templates
@@ -58,7 +59,7 @@
 - OpenAPI 기반 API 스캔 결과가 HTML 리포트에 통합됨
 - full profile 없이 active scan이 실행되지 않음
 
-상태 메모: `0.2.0`은 native TLS baseline만 제공합니다. ZAP, Nuclei, Schemathesis, testssl.sh, OpenAPI scan은 이 milestone의 planned 항목으로 남아 있습니다.
+상태 메모: `0.2.0`은 native TLS baseline을, `0.2.1`은 local-file-only native OpenAPI baseline을 제공합니다. ZAP, Nuclei, Schemathesis, testssl.sh, active OpenAPI scan은 이 milestone의 planned 항목으로 남아 있습니다.
 
 ## v0.3: CI/CD 연동
 

@@ -75,7 +75,7 @@ Options:
 --non-interactive       create config from defaults and supplied flags
 --project-name <name>   project name
 --target <url>          web target URL
---openapi <path-or-url> OpenAPI spec path or URL
+--openapi <path>        local OpenAPI spec path
 --profile <name>        default profile
 --force                 overwrite existing scanrail.yaml
 ```
@@ -112,6 +112,7 @@ scanrail run --profile quick
 scanrail run --only headers
 scanrail run --only gitleaks
 scanrail run --only tls
+scanrail run --only openapi --openapi ./openapi.yaml
 scanrail run --target https://staging.example.com
 ```
 
@@ -121,6 +122,7 @@ Options:
 --profile <name>        profile name, default quick
 --only <scanner>        run one scanner explicitly
 --target <url>          override web target URL
+--openapi <path>        override local OpenAPI spec path
 --output-dir <path>     report output directory
 ```
 
@@ -132,6 +134,7 @@ Target behavior:
 - `gitleaks` requires Docker and scans the local workspace through a read-only bind mount.
 - `headers` is native Go code and does not require Docker.
 - `tls` is native Go code and performs a single TLS handshake against HTTPS targets.
+- `openapi` is native Go code, reads a local OpenAPI JSON or common YAML file, and does not probe API endpoints.
 
 ## `scanrail version`
 

@@ -13,6 +13,7 @@ const DefaultPath = "scanrail.yaml"
 type Config struct {
 	ProjectName       string
 	TargetURL         string
+	OpenAPIPath       string
 	Allowlist         []string
 	TokenEnv          string
 	OutputDir         string
@@ -84,6 +85,8 @@ func Load(path string, workdir string) (Config, error) {
 			cfg.ProjectName = value
 		case "targets.web.url":
 			cfg.TargetURL = value
+		case "targets.api.openapi":
+			cfg.OpenAPIPath = value
 		case "auth.token_env":
 			cfg.TokenEnv = value
 		case "report.output_dir":
@@ -119,6 +122,13 @@ func WriteInitial(path string, cfg Config, force bool) error {
 			return errors.New(path + " already exists; use --force to overwrite")
 		}
 	}
+	apiBlock := ""
+	if strings.TrimSpace(cfg.OpenAPIPath) != "" {
+		apiBlock = `
+  api:
+    openapi: ` + cfg.OpenAPIPath + `
+`
+	}
 	content := `project:
   name: ` + cfg.ProjectName + `
   type: web-api
@@ -130,6 +140,7 @@ targets:
       - ` + hostOnly(cfg.TargetURL) + `
     exclude_paths:
       - /logout
+` + apiBlock + `
 
 auth:
   type: bearer
@@ -143,6 +154,7 @@ profiles:
       - gitleaks
       - headers
       - tls
+      - openapi
 
 safety:
   active_scan_default: false

@@ -12,6 +12,7 @@ func TestLoadGeneratedConfig(t *testing.T) {
 	cfg := Defaults(dir)
 	cfg.ProjectName = "demo"
 	cfg.TargetURL = "http://localhost:8080"
+	cfg.OpenAPIPath = "./openapi.yaml"
 	if err := WriteInitial(path, cfg, false); err != nil {
 		t.Fatal(err)
 	}
@@ -24,6 +25,9 @@ func TestLoadGeneratedConfig(t *testing.T) {
 	}
 	if loaded.TargetURL != "http://localhost:8080" {
 		t.Fatalf("TargetURL = %q", loaded.TargetURL)
+	}
+	if loaded.OpenAPIPath != "./openapi.yaml" {
+		t.Fatalf("OpenAPIPath = %q", loaded.OpenAPIPath)
 	}
 	if len(loaded.Allowlist) != 1 || loaded.Allowlist[0] != "localhost:8080" {
 		t.Fatalf("Allowlist = %#v", loaded.Allowlist)
