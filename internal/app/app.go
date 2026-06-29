@@ -226,6 +226,17 @@ func Run(ctx context.Context, opts RunOptions, stdout io.Writer) int {
 				continue
 			}
 		}
+		if requiresWebTargetGuard(tool) && strings.TrimSpace(cfg.TargetURL) != "" {
+			if err := safety.ValidateWebTarget(cfg.TargetURL, webTargetPolicy(cfg)); err != nil {
+				reason := redactor.RedactString(err.Error())
+				if opts.Only == tool {
+					fmt.Fprintf(stdout, "%s safety violation: %s\n", tool, reason)
+					return exitcode.SafetyViolation
+				}
+				runReport.Skipped = append(runReport.Skipped, report.Skipped{Tool: tool, Reason: reason})
+				continue
+			}
+		}
 		switch tool {
 		case "headers":
 			findings, err := headers.Scan(ctx, cfg.TargetURL)
@@ -351,6 +362,25 @@ func severityRank(sev string) int {
 		return 1
 	default:
 		return 0
+	}
+}
+
+func requiresWebTargetGuard(tool string) bool {
+	switch tool {
+	case "headers", "tls":
+		return true
+	default:
+		return false
+	}
+}
+
+func webTargetPolicy(cfg config.Config) safety.WebTargetPolicy {
+	blockedPaths := append([]string{}, cfg.ExcludePaths...)
+	blockedPaths = append(blockedPaths, cfg.BlockedPaths...)
+	return safety.WebTargetPolicy{
+		Allowlist:        cfg.Allowlist,
+		BlockedPaths:     blockedPaths,
+		RequireAllowlist: cfg.RequireAllowlist,
 	}
 }
 

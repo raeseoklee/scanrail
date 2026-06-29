@@ -21,7 +21,7 @@ Scanrail does not try to reimplement a commercial SAST or DAST engine. Its job i
 
 ## Direction
 
-The long-term model is to orchestrate tools such as OWASP ZAP, Nuclei, Semgrep, Trivy, and Gitleaks through isolated adapters, usually Docker-backed. The current MVP provides the CLI scaffold, configuration flow, report generation, npm wrapper distribution, native security headers, TLS certificate, and OpenAPI baseline scanners, plus a Docker-backed Gitleaks secrets adapter.
+The long-term model is to orchestrate tools such as OWASP ZAP, Nuclei, Semgrep, Trivy, and Gitleaks through isolated adapters, usually Docker-backed. The current MVP provides the CLI scaffold, configuration flow, report generation, npm wrapper distribution, native security headers, TLS certificate, and OpenAPI baseline scanners, configured target guardrails, plus a Docker-backed Gitleaks secrets adapter.
 
 ```text
 scanrail init
@@ -81,6 +81,7 @@ The stdio MCP path can be regression-tested with [MCP Workbench](examples/mcp-wo
 - [OSS Strategy](docs/oss-strategy.md)
 - [Distribution Strategy](docs/distribution.md)
 - [npm Publish Runbook](docs/npm-publish.md)
+- [Release Notes 0.2.2](docs/releases/0.2.2.md)
 - [Release Notes 0.2.1](docs/releases/0.2.1.md)
 - [Release Notes 0.2.0](docs/releases/0.2.0.md)
 - [Release Checklist](docs/release-checklist.md)
@@ -122,7 +123,7 @@ The current MVP supports:
 - platform-specific binary packages for macOS, Windows, and Linux
 - release dry-run automation
 
-Docker-backed Trivy and Semgrep adapters remain planned. Gitleaks is the first Docker-backed adapter, using the pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image and redacted raw artifacts. The native TLS scanner performs a single TLS handshake for HTTPS targets and reports certificate trust, hostname, expiry, and legacy protocol findings. The native OpenAPI scanner reads a local JSON or common YAML OpenAPI file and reports missing version/server metadata, plain HTTP server URLs, operations without effective security requirements, and operations that omit documented client error responses.
+Docker-backed Trivy and Semgrep adapters remain planned. Gitleaks is the first Docker-backed adapter, using the pinned `ghcr.io/gitleaks/gitleaks:v8.30.1` image and redacted raw artifacts. The native headers and TLS scanners enforce configured web target allowlists and blocked/excluded paths before making network contact. The native TLS scanner performs a single TLS handshake for HTTPS targets and reports certificate trust, hostname, expiry, and legacy protocol findings. The native OpenAPI scanner reads a local JSON or common YAML OpenAPI file and reports missing version/server metadata, plain HTTP server URLs, operations without effective security requirements, and operations that omit documented client error responses.
 
 ## Development
 
@@ -146,9 +147,9 @@ Apache-2.0. See [LICENSE](LICENSE).
 ## Safety Defaults
 
 - Active scanning is disabled by default.
-- Requests outside configured allowlists are rejected when the selected scanner can enforce that scope.
+- Requests outside configured allowlists are rejected before native interactive scanners run.
+- Configured `targets.web.exclude_paths` and `safety.blocked_paths` are enforced before native interactive scanners run.
 - Secrets are referenced by environment variable name, not stored in project config.
-- Destructive paths are blocked or explicitly warned about.
 - Production targets require explicit opt-in.
 - Scanner capability gaps are surfaced as skips or failures instead of silently weakening the safety policy.
 

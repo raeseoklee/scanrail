@@ -24,6 +24,7 @@ func InteractiveNetworkRequirements() Capabilities {
 	return Capabilities{
 		AllowlistScope: true,
 		RedirectScope:  true,
+		BlockedPaths:   true,
 		RateLimit:      true,
 	}
 }

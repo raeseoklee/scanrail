@@ -42,9 +42,10 @@ auth_injection
 - Gitleaks는 첫 production-ready Docker 기반 passive scanner이며 workspace를 read-only로 mount합니다.
 - Trivy와 Semgrep은 아직 production-ready가 아니므로 profile 실행에서 skip합니다.
 - production-ready가 아닌 scanner를 명시 실행하면 safety exit code `5`로 실패합니다.
-- native headers scanner는 redirect를 따르지 않고 `allowlist_scope`, `redirect_scope`, `rate_limit`, `header_injection`을 선언합니다.
-- native TLS scanner는 HTTPS target에 단일 TLS handshake만 수행하고 HTTP payload를 보내지 않으며 `allowlist_scope`, `redirect_scope`, `rate_limit`을 선언합니다.
+- native headers scanner는 redirect를 따르지 않고 `allowlist_scope`, `redirect_scope`, `blocked_paths`, `rate_limit`, `header_injection`을 선언합니다.
+- native TLS scanner는 HTTPS target에 단일 TLS handshake만 수행하고 HTTP payload를 보내지 않으며 `allowlist_scope`, `redirect_scope`, `blocked_paths`, `rate_limit`을 선언합니다.
 - native OpenAPI scanner는 local spec file만 읽습니다. remote spec을 fetch하지 않고 credential을 사용하지 않으며 API endpoint를 호출하지 않습니다.
+- Scanrail은 native headers, native TLS, MCP headers scan 실행 전에 configured web target allowlist와 blocked/excluded path를 shared preflight에서 강제합니다.
 
 네트워크 레벨 강제 모델은 v0.x 후속 과제입니다. 이 방식은 전용 Docker network와 egress proxy를 두고 allowlist, path, method, RPS를 프록시에서 강제하는 구조입니다.
 
@@ -63,6 +64,8 @@ targets:
 차단 조건:
 
 - target host가 allowlist에 없음
+- target path가 `targets.web.exclude_paths`와 일치함
+- target path가 `safety.blocked_paths`와 일치함
 - scanner가 redirect 제한 capability를 지원하고 redirect 대상이 allowlist 밖으로 벗어남
 - OpenAPI server URL이 allowlist 밖임
 - scanner가 allowlist scoping capability를 지원하지 않는데 profile이 해당 보장을 요구함
@@ -71,6 +74,8 @@ allowlist 검증은 두 단계입니다.
 
 1. 실행 전 target URL과 OpenAPI server URL을 검증합니다.
 2. scanner adapter capability를 확인해 런타임 이탈을 제한할 수 있는지 판단합니다.
+
+현재 `0.2.2` 강제 범위는 native headers, native TLS, MCP headers scan이 network contact를 만들기 전 configured target URL을 검사하는 것입니다. third-party container용 network egress proxy는 아직 제공하지 않습니다.
 
 ## Intrusiveness 등급
 

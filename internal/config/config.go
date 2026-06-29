@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -15,10 +16,14 @@ type Config struct {
 	TargetURL         string
 	OpenAPIPath       string
 	Allowlist         []string
+	ExcludePaths      []string
+	BlockedPaths      []string
 	TokenEnv          string
 	OutputDir         string
 	FailOn            string
 	ActiveScanDefault bool
+	RequireAllowlist  bool
+	MaxRPS            int
 }
 
 func Defaults(workdir string) Config {
@@ -31,6 +36,7 @@ func Defaults(workdir string) Config {
 		TokenEnv:    "SCANRAIL_TOKEN",
 		OutputDir:   ".scanrail/reports",
 		FailOn:      "high",
+		MaxRPS:      5,
 	}
 }
 
@@ -65,6 +71,10 @@ func Load(path string, workdir string) (Config, error) {
 			switch strings.Join(stack, ".") {
 			case "targets.web.allowlist":
 				cfg.Allowlist = append(cfg.Allowlist, value)
+			case "targets.web.exclude_paths":
+				cfg.ExcludePaths = append(cfg.ExcludePaths, value)
+			case "safety.blocked_paths":
+				cfg.BlockedPaths = append(cfg.BlockedPaths, value)
 			}
 			continue
 		}
@@ -95,6 +105,12 @@ func Load(path string, workdir string) (Config, error) {
 			cfg.FailOn = value
 		case "safety.active_scan_default":
 			cfg.ActiveScanDefault = value == "true"
+		case "safety.require_allowlist":
+			cfg.RequireAllowlist = value == "true"
+		case "safety.max_rps":
+			if parsed, err := strconv.Atoi(value); err == nil {
+				cfg.MaxRPS = parsed
+			}
 		}
 	}
 	if err := scanner.Err(); err != nil {

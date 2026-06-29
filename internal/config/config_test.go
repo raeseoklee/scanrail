@@ -32,6 +32,18 @@ func TestLoadGeneratedConfig(t *testing.T) {
 	if len(loaded.Allowlist) != 1 || loaded.Allowlist[0] != "localhost:8080" {
 		t.Fatalf("Allowlist = %#v", loaded.Allowlist)
 	}
+	if len(loaded.ExcludePaths) != 1 || loaded.ExcludePaths[0] != "/logout" {
+		t.Fatalf("ExcludePaths = %#v", loaded.ExcludePaths)
+	}
+	if len(loaded.BlockedPaths) != 1 || loaded.BlockedPaths[0] != "/logout" {
+		t.Fatalf("BlockedPaths = %#v", loaded.BlockedPaths)
+	}
+	if !loaded.RequireAllowlist {
+		t.Fatal("RequireAllowlist = false, want true")
+	}
+	if loaded.MaxRPS != 5 {
+		t.Fatalf("MaxRPS = %d, want 5", loaded.MaxRPS)
+	}
 	if loaded.TokenEnv != "SCANRAIL_TOKEN" {
 		t.Fatalf("TokenEnv = %q", loaded.TokenEnv)
 	}

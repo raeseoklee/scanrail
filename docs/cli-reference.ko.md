@@ -167,6 +167,8 @@ exit code:
 - `headers`는 native Go scanner라 Docker가 없어도 실행할 수 있습니다.
 - `tls`는 native Go scanner이며 HTTPS target에 단일 TLS handshake를 수행합니다.
 - `openapi`는 native Go scanner이며 local OpenAPI JSON 또는 일반적인 YAML file을 읽고 API endpoint를 호출하지 않습니다.
+- native interactive scanner는 `safety.require_allowlist`가 켜져 있으면 network contact 전에 `targets.web.allowlist`를 강제합니다.
+- native interactive scanner는 target path가 `targets.web.exclude_paths` 또는 `safety.blocked_paths`와 일치하면 실행을 거부합니다.
 - profile에 포함된 scanner가 실행 조건을 만족하지 못하면 skip reason을 report에 남깁니다.
 - `--only`로 명시한 scanner가 실행 조건을 만족하지 못하면 실패합니다.
 
@@ -200,7 +202,8 @@ scanrail mcp serve
 - arbitrary shell execution 없음
 - MCP MVP의 `scanrail_run`은 native `headers` scanner만 지원
 - active scan 실행은 `confirm_active_scan=true` 필요
-- target host는 configured target host 또는 `targets.web.allowlist`와 일치해야 함
+- allowlist enforcement가 켜져 있으면 target host는 `targets.web.allowlist`를 통과해야 함
+- target path는 `targets.web.exclude_paths` 또는 `safety.blocked_paths`와 일치하면 안 됨
 - MCP-triggered scan attempt는 `.scanrail/logs/mcp-audit.jsonl`에 기록됨
 
 ## scanrail update

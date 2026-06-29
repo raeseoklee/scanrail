@@ -43,14 +43,15 @@ Features:
 
 - native TLS certificate baseline (`0.2.0` shipped)
 - native local OpenAPI baseline (`0.2.1` shipped)
+- web target allowlist and blocked path guardrails (`0.2.2` shipped)
 - OWASP ZAP baseline
 - ZAP OpenAPI scan
 - Nuclei safe templates
 - Schemathesis
 - testssl.sh
 - bearer/cookie authentication references
-- allowlist validation
-- blocked paths
+- allowlist validation (`0.2.2` shipped for native interactive scanners)
+- blocked paths (`0.2.2` shipped for native interactive scanners)
 - rate limits
 
 Completion criteria:
@@ -59,7 +60,7 @@ Completion criteria:
 - OpenAPI scan results appear in HTML reports
 - active scans do not run without explicit opt-in
 
-Status note: `0.2.0` ships the native TLS baseline and `0.2.1` ships a local-file-only native OpenAPI baseline. ZAP, Nuclei, Schemathesis, testssl.sh, and active OpenAPI scanning remain planned under this milestone.
+Status note: `0.2.0` ships the native TLS baseline, `0.2.1` ships a local-file-only native OpenAPI baseline, and `0.2.2` ships configured web target guardrail enforcement for native interactive scanners. ZAP, Nuclei, Schemathesis, testssl.sh, and active OpenAPI scanning remain planned under this milestone.
 
 ## v0.3: CI/CD Integration
 

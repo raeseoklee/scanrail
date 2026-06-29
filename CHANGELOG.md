@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 0.2.2 - 2026-06-29
+
+- Enforce configured web target allowlists before native interactive scanners run.
+- Parse and apply `targets.web.exclude_paths` and `safety.blocked_paths` as preflight path guardrails for `headers`, `tls`, and MCP-triggered headers scans.
+- Load `safety.require_allowlist` and `safety.max_rps` from `scanrail.yaml`.
+- Require `blocked_paths` capability for interactive scanner definitions and declare it for the native headers and TLS scanners.
+- Refresh README, CLI/config/safety docs, roadmap, risk docs, npm README files, and release notes for the target guardrail surface.
+
 ## 0.2.1 - 2026-06-25
 
 - Add a native local-file-only OpenAPI baseline scanner.

@@ -131,6 +131,8 @@ Target behavior:
 - If a profile-selected scanner has no required target, it is skipped with evidence.
 - If a scanner was selected with `--only` and its target is missing, the command fails.
 - Safety capability mismatches fail explicit execution and are recorded for profile execution.
+- Native interactive scanners reject targets outside `targets.web.allowlist` before network contact when `safety.require_allowlist` is enabled.
+- Native interactive scanners reject targets whose path matches `targets.web.exclude_paths` or `safety.blocked_paths`.
 - `gitleaks` requires Docker and scans the local workspace through a read-only bind mount.
 - `headers` is native Go code and does not require Docker.
 - `tls` is native Go code and performs a single TLS handshake against HTTPS targets.
@@ -177,7 +179,8 @@ Safety behavior:
 - no arbitrary shell execution
 - `scanrail_run` only supports the native `headers` scanner in the MCP MVP
 - active scan execution requires `confirm_active_scan=true`
-- target host must match the configured target host or `targets.web.allowlist`
+- target host must pass `targets.web.allowlist` when allowlist enforcement is enabled
+- target path must not match `targets.web.exclude_paths` or `safety.blocked_paths`
 - MCP-triggered scan attempts are recorded in `.scanrail/logs/mcp-audit.jsonl`
 
 ## Planned Commands

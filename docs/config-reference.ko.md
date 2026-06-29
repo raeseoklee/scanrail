@@ -242,8 +242,15 @@ max_rps: 5
 
 `targets.web.exclude_paths`와 `safety.blocked_paths`는 의미가 다릅니다.
 
-- `targets.web.exclude_paths`: crawler나 scanner가 탐색하지 않아야 하는 경로입니다.
+- `targets.web.exclude_paths`: crawler나 scanner가 탐색하지 않아야 하는 경로입니다. 현재 native `headers`, native `tls`, MCP headers 경로에서는 configured target URL path가 이 목록과 일치하면 실행 전에 차단합니다.
 - `safety.blocked_paths`: 요청 자체가 금지되는 경로입니다. scanner가 이 차단을 강제할 수 없으면 해당 scanner는 제외되거나 경고 후 skip되어야 합니다.
+
+현재 강제 범위:
+
+- `safety.require_allowlist`가 `true`이면 native interactive scanner 실행 전에 `targets.web.allowlist`를 검사합니다.
+- native `headers`, native `tls`, MCP headers scan 실행 전에 `targets.web.exclude_paths`와 `safety.blocked_paths`를 검사합니다.
+- profile 실행에서 guardrail에 막힌 scanner는 skipped reason으로 기록됩니다.
+- `scanrail run --only headers` 또는 `scanrail run --only tls` 명시 실행에서 guardrail에 막히면 safety exit code `5`를 반환합니다.
 
 ## policy
 

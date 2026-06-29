@@ -2,7 +2,7 @@
 
 # Release and Product Risk Register
 
-This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, MCP audit logging, the MCP Workbench verification pass, the `0.1.4` Gitleaks adapter slice, the `0.2.0` native TLS baseline slice, and the `0.2.1` native OpenAPI baseline slice.
+This register tracks the material risks that remain after the first public npm release, trusted publishing setup, the `0.1.2` MCP MVP, MCP audit logging, the MCP Workbench verification pass, the `0.1.4` Gitleaks adapter slice, the `0.2.0` native TLS baseline slice, the `0.2.1` native OpenAPI baseline slice, and the `0.2.2` target guardrail slice.
 
 Last reviewed: June 25, 2026.
 
@@ -21,7 +21,7 @@ Last reviewed: June 25, 2026.
 | npm distribution | Stable for MVP with checklist gate | Trusted publisher settings and npm package state live outside git. |
 | Cross-platform install | Covered by smoke workflow | Public npm smoke is scheduled/manual, not run on every commit. |
 | MCP MVP | Implemented, audit-logged, and Workbench-verified | Real production host compatibility is not complete. |
-| Scanner adapters | Native headers, native TLS baseline, native local OpenAPI baseline, and first Docker-backed adapter implemented for Gitleaks | Trivy/Semgrep execution, broader DAST, OS matrix coverage, and digest-level image policy are still planned. |
+| Scanner adapters | Native headers, native TLS baseline, native local OpenAPI baseline, web target guardrail preflight, and first Docker-backed adapter implemented for Gitleaks | Trivy/Semgrep execution, broader DAST, third-party container egress enforcement, OS matrix coverage, and digest-level image policy are still planned. |
 | Reporting | JSON/HTML for headers, TLS, and Gitleaks | SARIF and false-positive workflow are still planned. |
 | OSS operations | Public repo is usable | Community triage, support boundaries, and governance are still lightweight. |
 
@@ -44,7 +44,7 @@ The operating gates for all remaining risks are tracked in the [Risk Treatment P
 | R-003 | Release artifacts outside npm are unsigned or absent | Medium | Accepted for npm MVP | npm provenance is in place. GitHub release archives, checksums, and additional package-manager channels remain roadmap work. | Add checksum and GitHub release asset generation before declaring a stable `v1.0` release path. |
 | R-004 | Public npm smoke does not run on every commit | Medium | Partially mitigated | `.github/workflows/npm-smoke.yml` covers Ubuntu, macOS, and Windows against the public registry on schedule or manual dispatch. | Decide whether to add a lightweight post-publish required smoke gate for release branches. |
 | R-005 | MCP server compatibility is narrower than the client ecosystem | Medium | Partially mitigated | `mcp-workbench inspect` and the Workbench regression spec validate stdio protocol behavior. | Add smoke notes or fixtures for at least one production MCP host before expanding MCP tools. |
-| R-006 | MCP tools could bypass CLI safety if they diverge from core policy | High | Controlled by design | MCP stays a thin adapter over the CLI safety model, active scans require `confirm_active_scan=true`, and allowlists are enforced. | Keep MCP tool implementations bound to the same config, exit-code, and safety validation paths as CLI execution. |
+| R-006 | MCP tools could bypass CLI safety if they diverge from core policy | High | Controlled by design | MCP stays a thin adapter over the CLI safety model, active scans require `confirm_active_scan=true`, and MCP headers scans reuse the shared allowlist/path guardrail. | Keep MCP tool implementations bound to the same config, exit-code, and safety validation paths as CLI execution. |
 | R-007 | MCP resources can leak sensitive configuration or oversized report data | High | Partially mitigated | Current config resources expose secret environment variable names, not values. Planned full report resources are still deferred. | Add size limits and redaction tests before adding `scanrail://reports/latest/json` or richer resources. |
 | R-008 | MCP tool calls are not yet auditable enough for team environments | Medium | Partially mitigated | MCP-triggered scan attempts now write denied, started, and completed events to `.scanrail/logs/mcp-audit.jsonl` with redacted targets and exit codes. Confirmed active scans refuse to run when the start audit event cannot be written. | Treat audit coverage as an MCP expansion gate for `scanrail_setup` and future scanner execution. |
 | R-009 | Scanner adapters can expand network or credential exposure | High | Partially mitigated | Gitleaks is enabled as a passive local scanner with a read-only workspace mount and writable raw output mount. Unready Docker adapters are skipped in profile runs and fail with exit code `5` when explicitly selected. The native headers scanner declares interactive network capabilities and does not follow redirects. The native TLS scanner opens one TLS connection, sends no HTTP payload, and reports certificate/protocol findings only. The native OpenAPI scanner reads local spec files only and rejects URL-valued specs. | Add adapter-specific integration coverage before enabling Trivy, Semgrep, or broader networked Docker scanners. |

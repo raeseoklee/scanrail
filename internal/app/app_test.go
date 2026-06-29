@@ -126,6 +126,72 @@ func TestRunOnlyTLSPersistsFindings(t *testing.T) {
 	}
 }
 
+func TestRunOnlyHeadersFailsSafetyOutsideAllowlist(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	cfg := `project:
+  name: demo
+targets:
+  web:
+    url: http://127.0.0.1:1
+    allowlist:
+      - staging.example.com
+safety:
+  require_allowlist: true
+policy:
+  fail_on:
+    severity: critical
+report:
+  output_dir: .scanrail/reports
+`
+	if err := os.WriteFile("scanrail.yaml", []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	var out bytes.Buffer
+	code := Run(context.Background(), RunOptions{Only: "headers"}, &out)
+	if code != exitcode.SafetyViolation {
+		t.Fatalf("Run exit code = %d, want SafetyViolation; output: %s", code, out.String())
+	}
+	if !strings.Contains(out.String(), "outside the configured Scanrail allowlist") {
+		t.Fatalf("safety output missing allowlist reason: %s", out.String())
+	}
+}
+
+func TestRunOnlyHeadersFailsSafetyForExcludedPath(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	cfg := `project:
+  name: demo
+targets:
+  web:
+    url: http://127.0.0.1:1/logout
+    allowlist:
+      - 127.0.0.1:1
+    exclude_paths:
+      - /logout
+safety:
+  require_allowlist: true
+policy:
+  fail_on:
+    severity: critical
+report:
+  output_dir: .scanrail/reports
+`
+	if err := os.WriteFile("scanrail.yaml", []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	var out bytes.Buffer
+	code := Run(context.Background(), RunOptions{Only: "headers"}, &out)
+	if code != exitcode.SafetyViolation {
+		t.Fatalf("Run exit code = %d, want SafetyViolation; output: %s", code, out.String())
+	}
+	if !strings.Contains(out.String(), "blocked by the configured Scanrail path safety policy") {
+		t.Fatalf("safety output missing blocked path reason: %s", out.String())
+	}
+}
+
 func TestRunOnlyOpenAPIPersistsFindings(t *testing.T) {
 	dir := t.TempDir()
 	t.Chdir(dir)

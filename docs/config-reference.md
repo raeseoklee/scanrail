@@ -110,7 +110,7 @@ targets:
       - /logout
 ```
 
-`exclude_paths` describes paths that scanners should avoid when they can. It is advisory unless the scanner adapter declares enforcement support.
+`exclude_paths` describes paths that scanners should avoid. In the current native `headers`, native `tls`, and MCP headers paths, Scanrail enforces these entries as a preflight block when the configured target URL path matches them. Future crawler-style adapters can also use the same list to avoid discovering or requesting those paths.
 
 ### API Target
 
@@ -184,6 +184,13 @@ safety:
 ```
 
 `blocked_paths` is a required safety boundary for scanners that can enforce it. If a scanner cannot enforce a required capability, Scanrail skips it or fails explicit execution.
+
+Current enforcement:
+
+- `targets.web.allowlist` is checked before native interactive scanners run when `safety.require_allowlist` is `true`.
+- `targets.web.exclude_paths` and `safety.blocked_paths` are checked before native `headers`, native `tls`, and MCP headers scans run.
+- A profile run records a skipped scanner when the guardrail blocks it.
+- An explicit `scanrail run --only headers` or `scanrail run --only tls` returns safety exit code `5` when the guardrail blocks it.
 
 ## `policy`
 

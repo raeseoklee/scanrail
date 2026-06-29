@@ -99,6 +99,18 @@ func TestAllowedTargetUsesConfigAllowlist(t *testing.T) {
 	}
 }
 
+func TestAllowedTargetRejectsBlockedPath(t *testing.T) {
+	cfg := config.Config{
+		TargetURL:        "https://staging.example.com",
+		Allowlist:        []string{"staging.example.com"},
+		BlockedPaths:     []string{"/logout"},
+		RequireAllowlist: true,
+	}
+	if err := allowedTarget(cfg, "https://staging.example.com/logout"); err == nil {
+		t.Fatal("expected blocked path to fail")
+	}
+}
+
 func TestLatestReportResourceRedactsSecretQuery(t *testing.T) {
 	dir := t.TempDir()
 	t.Chdir(dir)

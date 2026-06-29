@@ -19,7 +19,7 @@
 
 ## 핵심 방향
 
-`scanrail`은 자체 취약점 탐지 엔진을 처음부터 만들지 않습니다. 대신 OWASP ZAP, Nuclei, Semgrep, Trivy, Gitleaks 같은 오픈소스 도구를 격리된 adapter로 실행하고, 결과를 하나의 형식으로 모아 개발자에게 제공합니다. 현재 MVP는 native security headers scanner, native TLS certificate baseline scanner, native OpenAPI baseline scanner, Docker 기반 Gitleaks secrets adapter를 제공합니다.
+`scanrail`은 자체 취약점 탐지 엔진을 처음부터 만들지 않습니다. 대신 OWASP ZAP, Nuclei, Semgrep, Trivy, Gitleaks 같은 오픈소스 도구를 격리된 adapter로 실행하고, 결과를 하나의 형식으로 모아 개발자에게 제공합니다. 현재 MVP는 native security headers scanner, native TLS certificate baseline scanner, native OpenAPI baseline scanner, configured target guardrail, Docker 기반 Gitleaks secrets adapter를 제공합니다.
 
 ```text
 scanrail init
@@ -79,6 +79,7 @@ stdio MCP 경로는 [MCP Workbench 검증](examples/mcp-workbench/README.ko.md)�
 - [OSS 전략](docs/oss-strategy.ko.md)
 - [배포 전략](docs/distribution.ko.md)
 - [npm Publish Runbook](docs/npm-publish.ko.md)
+- [릴리스 노트 0.2.2](docs/releases/0.2.2.ko.md)
 - [릴리스 노트 0.2.1](docs/releases/0.2.1.ko.md)
 - [릴리스 노트 0.2.0](docs/releases/0.2.0.ko.md)
 - [Release Checklist](docs/release-checklist.ko.md)
@@ -119,7 +120,7 @@ Scanner adapter 실증:
 - macOS, Windows, Linux용 npm wrapper와 platform binary package
 - release dry-run 자동화
 
-Gitleaks는 `ghcr.io/gitleaks/gitleaks:v8.30.1`로 고정된 첫 Docker 기반 adapter입니다. native TLS scanner는 HTTPS target에 단일 TLS handshake를 수행하고 certificate trust, hostname, expiry, legacy protocol finding을 리포트합니다. native OpenAPI scanner는 local JSON 또는 일반적인 YAML OpenAPI file을 읽고 version/server metadata, plain HTTP server URL, effective security requirement가 없는 operation, client error response 문서 누락을 리포트합니다. Trivy, Semgrep adapter와 SARIF 리포트는 다음 단계에서 구현합니다.
+Gitleaks는 `ghcr.io/gitleaks/gitleaks:v8.30.1`로 고정된 첫 Docker 기반 adapter입니다. native headers/TLS scanner는 network contact 전에 configured web target allowlist와 blocked/excluded path를 강제합니다. native TLS scanner는 HTTPS target에 단일 TLS handshake를 수행하고 certificate trust, hostname, expiry, legacy protocol finding을 리포트합니다. native OpenAPI scanner는 local JSON 또는 일반적인 YAML OpenAPI file을 읽고 version/server metadata, plain HTTP server URL, effective security requirement가 없는 operation, client error response 문서 누락을 리포트합니다. Trivy, Semgrep adapter와 SARIF 리포트는 다음 단계에서 구현합니다.
 
 ## 개발
 
@@ -139,9 +140,9 @@ Apache-2.0. [LICENSE](LICENSE)를 참고하세요.
 ## 기본 안전 원칙
 
 - Active Scan은 기본 비활성화합니다.
-- allowlist 밖 도메인은 요청하지 않습니다.
+- native interactive scanner는 allowlist 밖 도메인을 요청하기 전에 거부합니다.
+- configured `targets.web.exclude_paths`와 `safety.blocked_paths`는 native interactive scanner 실행 전에 차단합니다.
 - 토큰과 비밀번호는 설정 파일에 저장하지 않습니다.
-- destructive path는 기본 차단하거나 명시 경고합니다.
 - 모든 스캔 요청에는 식별 가능한 스캔 헤더를 추가할 수 있습니다.
 - 운영 환경 대상 스캔은 별도 명시 플래그를 요구합니다.
 

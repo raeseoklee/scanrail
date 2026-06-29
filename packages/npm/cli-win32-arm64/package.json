@@ -1,6 +1,6 @@
 {
   "name": "@scanrail/cli-win32-arm64",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Scanrail binary for Windows arm64",
   "license": "Apache-2.0",
   "repository": {

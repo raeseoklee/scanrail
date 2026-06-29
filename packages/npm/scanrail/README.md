@@ -28,7 +28,9 @@ scanrail init --non-interactive --project-name demo --target https://example.com
 scanrail run --profile quick
 ```
 
-The current MVP includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, native security headers, TLS certificate, and local OpenAPI baseline scanners, and a Docker-backed Gitleaks secrets adapter. Use `scanrail run --only headers`, `scanrail run --only tls`, or `scanrail run --only openapi` without Docker, or `scanrail run --only gitleaks` for the secrets scan only. Trivy and Semgrep adapters are planned.
+The current MVP includes the CLI scaffold, config generation, workspace setup, JSON/HTML reporting, native security headers, TLS certificate, and local OpenAPI baseline scanners, configured web target guardrails, and a Docker-backed Gitleaks secrets adapter. Use `scanrail run --only headers`, `scanrail run --only tls`, or `scanrail run --only openapi` without Docker, or `scanrail run --only gitleaks` for the secrets scan only. Trivy and Semgrep adapters are planned.
+
+Native interactive scanners reject targets outside `targets.web.allowlist` and block configured `targets.web.exclude_paths` / `safety.blocked_paths` before making network contact.
 
 ## MCP
 

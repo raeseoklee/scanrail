@@ -26,6 +26,7 @@ var definitions = map[string]Definition{
 		Capabilities: safety.Capabilities{
 			AllowlistScope:  true,
 			RedirectScope:   true,
+			BlockedPaths:    true,
 			RateLimit:       true,
 			HeaderInjection: true,
 		},
@@ -42,6 +43,7 @@ var definitions = map[string]Definition{
 		Capabilities: safety.Capabilities{
 			AllowlistScope: true,
 			RedirectScope:  true,
+			BlockedPaths:   true,
 			RateLimit:      true,
 		},
 		ProductionReady: true,

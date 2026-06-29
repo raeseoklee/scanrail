@@ -2,6 +2,14 @@
 
 # 변경 기록
 
+## 0.2.2 - 2026-06-29
+
+- native interactive scanner 실행 전에 configured web target allowlist를 강제합니다.
+- `targets.web.exclude_paths`와 `safety.blocked_paths`를 읽고 `headers`, `tls`, MCP headers scan의 사전 path guardrail로 적용합니다.
+- `scanrail.yaml`의 `safety.require_allowlist`, `safety.max_rps`를 load합니다.
+- interactive scanner definition에 `blocked_paths` capability를 요구하고 native headers/TLS scanner에 이를 선언합니다.
+- target guardrail surface에 맞춰 README, CLI/config/safety 문서, roadmap, risk 문서, npm README, release note를 갱신합니다.
+
 ## 0.2.1 - 2026-06-25
 
 - local-file-only native OpenAPI baseline scanner를 추가합니다.

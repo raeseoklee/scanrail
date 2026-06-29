@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -570,33 +569,25 @@ func redactedConfig(cfg config.Config) map[string]any {
 		"project_name":        cfg.ProjectName,
 		"target_url":          redactor.RedactString(cfg.TargetURL),
 		"allowlist":           redactor.RedactValue(cfg.Allowlist),
+		"exclude_paths":       redactor.RedactValue(cfg.ExcludePaths),
+		"blocked_paths":       redactor.RedactValue(cfg.BlockedPaths),
 		"auth":                map[string]string{"token_env": cfg.TokenEnv},
 		"output_dir":          redactor.RedactString(cfg.OutputDir),
 		"fail_on":             cfg.FailOn,
 		"active_scan_default": cfg.ActiveScanDefault,
+		"require_allowlist":   cfg.RequireAllowlist,
+		"max_rps":             cfg.MaxRPS,
 	}
 }
 
 func allowedTarget(cfg config.Config, target string) error {
-	targetHost, err := hostname(target)
-	if err != nil {
-		return fmt.Errorf("invalid target URL: %w", err)
-	}
-	if targetHost == "" {
-		return errors.New("target URL must include a hostname")
-	}
-	if cfg.TargetURL != "" {
-		cfgHost, err := hostname(cfg.TargetURL)
-		if err == nil && targetHost == cfgHost {
-			return nil
-		}
-	}
-	for _, allowed := range cfg.Allowlist {
-		if targetHost == normalizeHost(allowed) {
-			return nil
-		}
-	}
-	return fmt.Errorf("target host %q is outside the configured Scanrail allowlist", targetHost)
+	blockedPaths := append([]string{}, cfg.ExcludePaths...)
+	blockedPaths = append(blockedPaths, cfg.BlockedPaths...)
+	return safety.ValidateWebTarget(target, safety.WebTargetPolicy{
+		Allowlist:        cfg.Allowlist,
+		BlockedPaths:     blockedPaths,
+		RequireAllowlist: cfg.RequireAllowlist,
+	})
 }
 
 func hostname(raw string) (string, error) {
@@ -605,26 +596,6 @@ func hostname(raw string) (string, error) {
 		return "", err
 	}
 	return strings.ToLower(parsed.Hostname()), nil
-}
-
-func normalizeHost(raw string) string {
-	raw = strings.TrimSpace(strings.ToLower(raw))
-	if raw == "" {
-		return ""
-	}
-	if strings.Contains(raw, "://") {
-		host, err := hostname(raw)
-		if err == nil {
-			return host
-		}
-	}
-	if host, _, err := net.SplitHostPort(raw); err == nil {
-		return strings.ToLower(host)
-	}
-	if host, _, ok := strings.Cut(raw, ":"); ok {
-		return host
-	}
-	return raw
 }
 
 func textToolResult(text string) toolResult {

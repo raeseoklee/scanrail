@@ -42,9 +42,10 @@ Current MVP enforcement:
 - Gitleaks is the first production-ready Docker-backed passive scanner and mounts the workspace read-only.
 - Trivy and Semgrep remain non-production-ready and are skipped in profile execution.
 - Explicit execution of a non-production-ready scanner fails with safety exit code `5`.
-- The native headers scanner does not follow redirects and declares `allowlist_scope`, `redirect_scope`, `rate_limit`, and `header_injection`.
-- The native TLS scanner performs one TLS handshake for HTTPS targets, sends no HTTP payload, and declares `allowlist_scope`, `redirect_scope`, and `rate_limit`.
+- The native headers scanner does not follow redirects and declares `allowlist_scope`, `redirect_scope`, `blocked_paths`, `rate_limit`, and `header_injection`.
+- The native TLS scanner performs one TLS handshake for HTTPS targets, sends no HTTP payload, and declares `allowlist_scope`, `redirect_scope`, `blocked_paths`, and `rate_limit`.
 - The native OpenAPI scanner reads a local spec file only. It does not fetch remote specs, use credentials, or call API endpoints.
+- Scanrail enforces configured web target allowlists and blocked/excluded paths in a shared preflight before native headers, native TLS, and MCP-triggered headers scans run.
 
 Network-level enforcement through a dedicated Docker network and egress proxy is a later v0.x design.
 
@@ -63,6 +64,8 @@ targets:
 Block conditions:
 
 - target host is not in the allowlist
+- target path matches `targets.web.exclude_paths`
+- target path matches `safety.blocked_paths`
 - OpenAPI server URL is outside the allowlist
 - scanner redirects outside the allowlist when redirect scoping is required
 - scanner lacks allowlist scoping while the profile requires it
@@ -71,6 +74,8 @@ Allowlist validation has two layers:
 
 1. Validate configured target URLs before execution.
 2. Check whether the scanner adapter can maintain scope during runtime.
+
+Current `0.2.2` enforcement covers the configured target URL before native headers, native TLS, and MCP-triggered headers scans make network contact. It does not yet provide a network egress proxy for third-party containers.
 
 ## Intrusiveness Levels
 
